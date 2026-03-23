@@ -36,7 +36,7 @@ src/
 
 ---
 
-## Setup
+## Quick start
 
 Clone the repo:
 
@@ -51,7 +51,13 @@ Install dependencies:
 npm install
 ```
 
-Create `.env`:
+Create `.env` from the example:
+
+```
+cp .env.example .env
+```
+
+Default `.env.example` values:
 
 ```
 PORT=5000
@@ -59,10 +65,40 @@ MONGODB_URI=mongodb://127.0.0.1:27017/clipsphere
 JWT_SECRET=your_secret_key
 ```
 
-Run server:
+Bring up dependencies (MongoDB via Docker):
 
 ```
-npx nodemon server.js
+npm run deps:up
+```
+
+Run API in development mode:
+
+```
+npm run dev
+```
+
+Or run both in one command:
+
+```
+npm run dev:with-deps
+```
+
+Run API in production mode:
+
+```
+npm start
+```
+
+Stop Docker dependencies:
+
+```
+npm run deps:down
+```
+
+View Mongo logs:
+
+```
+npm run deps:logs
 ```
 
 ---
@@ -75,24 +111,6 @@ Base URL:
 http://localhost:5000/api/v1
 ```
 
-Auth:
-
-* POST `/auth/register`
-* POST `/auth/login`
-
-Admin:
-
-* GET `/admin/health`
-
----
-
-## Auth
-
-Use Bearer token:
-
-```
-Authorization: Bearer <token>
-```
 
 ---
 
@@ -106,25 +124,10 @@ http://localhost:5000/api-docs
 
 ## Postman
 
-Collection موجود في:
+Collection:
 
 ```
 postman/
 ```
 
----
 
-## Notes
-
-* Use Express v4 (not v5)
-* MongoDB creates DB on first insert
-* `.env` should not be committed
-
----
-
-## Team
-
-Dev1: auth + infrastructure
-Dev2: users
-Dev3: videos
-Dev4: admin
