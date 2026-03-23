@@ -1,0 +1,623 @@
+{
+  "info": {
+    "_postman_id": "e935dfbe-fae8-43b3-85d4-709b101036c3",
+    "name": "ClipSphere API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39617378"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response time is below 1000ms', function () {",
+              "  pm.expect(pm.response.responseTime).to.be.below(1000);",
+              "});",
+              "",
+              "pm.test('Response has success status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "});",
+              "",
+              "pm.test('Data status is ok', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.status).to.equal('ok');",
+              "});",
+              "",
+              "pm.test('Data has timestamp', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.timestamp).to.be.a('string');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register - Success",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const ts = Date.now();",
+              "pm.environment.set('testEmail', 'user_' + ts + '@test.com');",
+              "pm.environment.set('testUsername', 'user_' + ts);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response has success status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "});",
+              "",
+              "pm.test('Response contains token', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.token).to.be.a('string');",
+              "});",
+              "",
+              "pm.test('Response contains user object with required fields', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('id');",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('username');",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('email');",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('role');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{testUsername}}\", \"email\": \"{{testEmail}}\", \"password\": \"secret1234\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register - Duplicate Email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 409', function () {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Response has error status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('error');",
+              "});",
+              "",
+              "pm.test('Error message mentions email', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.message).to.include('Email');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"{{testUsername}}_dup\", \"email\": \"{{testEmail}}\", \"password\": \"secret1234\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register - Invalid Input (Zod)",
+      "event": [
+        {
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('Response has error status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('error');",
+              "});",
+              "",
+              "pm.test('Response has a validation error message', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.message).to.be.a('string').and.not.empty;",
+              "});"
+            ]
+          },
+          "listen": "test"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"ab\", \"email\": \"not-an-email\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login - Success",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has success status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "});",
+              "",
+              "pm.test('Response contains token and stores it', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.token).to.be.a('string');",
+              "  pm.environment.set('token', responseBodyJson.data.token);",
+              "});",
+              "",
+              "pm.test('Response contains user object', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('id');",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('email');",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('role');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{testEmail}}\", \"password\": \"secret1234\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login - Wrong Password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('Response has error status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('error');",
+              "});",
+              "",
+              "pm.test('Error message is generic (no credential leak)', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.message).to.equal('Invalid email or password');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{testEmail}}\", \"password\": \"wrongpassword123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Protected Route - No Token (401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('Response has error status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('error');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/protected",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "protected"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Protected Route - With Token (200)",
+      "event": [
+        {
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has success status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "});",
+              "",
+              "pm.test('Response includes user object', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.user).to.be.an('object');",
+              "  pm.expect(responseBodyJson.data.user).to.have.property('id');",
+              "});"
+            ],
+            "type": "text/javascript"
+          },
+          "listen": "test"
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/protected",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "protected"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Only - User Token (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403', function () {",
+              "  pm.response.to.have.status(403);",
+              "});",
+              "",
+              "pm.test('Response has error status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('error');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin-only",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin-only"
+          ]
+        },
+        "description": "Uses a regular user token (role: user). Expects 403 — only admins can access this route."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Only - Admin Token (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has success status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "});",
+              "",
+              "pm.test('Response has welcome admin message', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data.message).to.equal('Welcome admin');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/admin-only",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "admin-only"
+          ]
+        },
+        "description": "Requires an admin token in {{token}}. Log in as a user with role:admin first to populate {{token}}."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Health - Admin Access (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has success status', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "});",
+              "",
+              "pm.test('Response data has uptime', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data).to.have.property('uptime');",
+              "  pm.expect(responseBodyJson.data.uptime).to.be.a('number');",
+              "});",
+              "",
+              "pm.test('Response data has memory usage', function () {",
+              "  const responseBodyJson = pm.response.json();",
+              "  pm.expect(responseBodyJson.data).to.have.property('memory');",
+              "  pm.expect(responseBodyJson.data.memory).to.be.an('object');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "health"
+          ]
+        },
+        "description": "Requires an admin token in {{token}}. Log in as a user with role:admin first to populate {{token}}."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    }
+  ]
+}
