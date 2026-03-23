@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.*
+logs/
+*.log
+dist/
+coverage/
+scripts/test-phase1.js
