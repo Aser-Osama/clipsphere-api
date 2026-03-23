@@ -4,7 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "deps:up": "docker compose up -d mongo",
+    "deps:down": "docker compose down",
+    "deps:logs": "docker compose logs -f mongo",
+    "dev:with-deps": "npm run deps:up && npm run dev",
+    "test": "echo \"No tests configured yet\""
   },
   "repository": {
     "type": "git",
@@ -17,5 +23,18 @@
   "bugs": {
     "url": "https://github.com/rghdasalah/clipsphere-api/issues"
   },
-  "homepage": "https://github.com/rghdasalah/clipsphere-api#readme"
+  "homepage": "https://github.com/rghdasalah/clipsphere-api#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.3.1",
+    "express": "^4.22.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.1",
+    "morgan": "^1.10.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
 }
