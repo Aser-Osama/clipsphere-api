@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const { AppError } = require('../middleware/errorHandler');
 
 exports.getMe = async (userId) => {
   const user = await User.findById(userId).select('-password');
@@ -7,11 +6,6 @@ exports.getMe = async (userId) => {
 };
 
 exports.updateMe = async (userId, updates) => {
-  // Prevent restricted fields
-  if (updates.email || updates.password || updates.role) {
-    throw new AppError('Cannot update email, password, or role', 400);
-  }
-
   const user = await User.findByIdAndUpdate(userId, updates, {
     new: true,
     runValidators: true,
@@ -20,6 +14,24 @@ exports.updateMe = async (userId, updates) => {
   return user;
 };
 
+
 exports.getUserById = async (id) => {
   return User.findById(id).select('username bio avatarKey role');
+};
+
+exports.updatePreferences = async (userId, updates) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    return null;
+  }
+
+  user.notificationPreferences = {
+    ...user.notificationPreferences,
+    ...updates,
+    inApp: { ...user.notificationPreferences.inApp, ...updates.inApp },
+    email: { ...user.notificationPreferences.email, ...updates.email }
+  };
+
+  await user.save();
+  return user.notificationPreferences;
 };
