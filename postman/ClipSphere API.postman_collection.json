@@ -972,7 +972,120 @@
         "description": "Requires an admin token in {{token}}. Log in as a user with role:admin first to populate {{token}}."
       },
       "response": []
-    }
+    },
+    {
+    "name": "Videos",
+    "item": [
+      {
+        "name": "Create Video",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+            { "key": "Content-Type", "value": "application/json", "type": "text" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{ \"title\": \"Test Video\", \"description\": \"Demo\", \"videoURL\": \"demo.mp4\", \"duration\": 120 }"
+          },
+          "url": { "raw": "{{baseUrl}}/api/v1/videos", "host": ["{{baseUrl}}"], "path": ["api","v1","videos"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('Status code is 201', () => pm.response.code === 201);",
+              "pm.test('Video created', () => pm.response.json().data.title === 'Test Video');"
+            ]}
+          }
+        ]
+      },
+      {
+        "name": "List Videos",
+        "request": {
+          "method": "GET",
+          "url": { "raw": "{{baseUrl}}/api/v1/videos", "host": ["{{baseUrl}}"], "path": ["api","v1","videos"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('Status code is 200', () => pm.response.code === 200);",
+              "pm.test('Array returned', () => Array.isArray(pm.response.json().data));"
+            ]}
+          }
+        ]
+      },
+      {
+        "name": "Update Video",
+        "request": {
+          "method": "PATCH",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+            { "key": "Content-Type", "value": "application/json", "type": "text" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{ \"title\": \"Updated Title\" }"
+          },
+          "url": { "raw": "{{baseUrl}}/api/v1/videos/{{videoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","videos","{{videoId}}"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('Status code is 200', () => pm.response.code === 200);",
+              "pm.test('Title updated', () => pm.response.json().data.title === 'Updated Title');"
+            ]}
+          }
+        ]
+      },
+      {
+        "name": "Delete Video",
+        "request": {
+          "method": "DELETE",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+          ],
+          "url": { "raw": "{{baseUrl}}/api/v1/videos/{{videoId}}", "host": ["{{baseUrl}}"], "path": ["api","v1","videos","{{videoId}}"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('Status code is 200', () => pm.response.code === 200);",
+              "pm.test('Video deleted message', () => pm.response.json().message === 'Video deleted');"
+            ]}
+          }
+        ]
+      },
+      {
+        "name": "Add Review",
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+            { "key": "Content-Type", "value": "application/json", "type": "text" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{ \"rating\": 5, \"comment\": \"Great video!\" }"
+          },
+          "url": { "raw": "{{baseUrl}}/api/v1/videos/{{videoId}}/reviews", "host": ["{{baseUrl}}"], "path": ["api","v1","videos","{{videoId}}","reviews"] }
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('Status code is 201', () => pm.response.code === 201);",
+              "pm.test('Review created', () => pm.response.json().data.rating === 5);"
+            ]}
+          }
+        ]
+      }
+    ]
+  }
+
   ],
   "variable": [
     {
