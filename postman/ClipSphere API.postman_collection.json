@@ -1,11 +1,338 @@
 {
   "info": {
-    "_postman_id": "e935dfbe-fae8-43b3-85d4-709b101036c3",
+    "_postman_id": "2243fac5-a3f6-4ff2-9d0b-adf56febdcd7",
     "name": "ClipSphere API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "39617378"
+    "_exporter_id": "44220921"
   },
   "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('User object returned', () => pm.response.json().data.username);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Updated username present', () => pm.response.json().data.username === 'newname');"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const ts = Date.now();\r",
+                  "pm.environment.set('newUsername', 'user_' + ts);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"{{newUsername}}\",\r\n  \"bio\": \"Updated bio\"\r\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/updateMe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "updateMe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Public profile has username', () => pm.response.json().data.username);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Follow User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', () => pm.response.code === 201);",
+                  "pm.test('Followed message returned', () => pm.response.json().message === 'Followed');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/follow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId}}",
+                "follow"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfollow User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Unfollowed message returned', () => pm.response.json().message === 'Unfollowed');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/unfollow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId}}",
+                "unfollow"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Followers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Followers array returned', () => Array.isArray(pm.response.json().data));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/followers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId}}",
+                "followers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Following",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Following array returned', () => Array.isArray(pm.response.json().data));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/following",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{userId}}",
+                "following"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Preferences",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Preferences object returned', () => pm.response.json().data);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"inApp\": { \"followers\": false }, \"email\": { \"comments\": true } }"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "preferences"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Health Check",
       "event": [
@@ -162,8 +489,8 @@
         "method": "POST",
         "header": [
           {
-            "value": "application/json",
-            "key": "Content-Type"
+            "key": "Content-Type",
+            "value": "application/json"
           }
         ],
         "body": {
@@ -219,8 +546,8 @@
         "method": "POST",
         "header": [
           {
-            "value": "application/json",
-            "key": "Content-Type"
+            "key": "Content-Type",
+            "value": "application/json"
           }
         ],
         "body": {
@@ -267,6 +594,7 @@
               "  const responseBodyJson = pm.response.json();",
               "  pm.expect(responseBodyJson.data.token).to.be.a('string');",
               "  pm.environment.set('token', responseBodyJson.data.token);",
+              "  pm.environment.set('userId', responseBodyJson.data.user.id);",
               "});",
               "",
               "pm.test('Response contains user object', function () {",
@@ -276,7 +604,9 @@
               "  pm.expect(responseBodyJson.data.user).to.have.property('role');",
               "});"
             ],
-            "type": "text/javascript"
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
           }
         }
       ],
@@ -284,8 +614,8 @@
         "method": "POST",
         "header": [
           {
-            "value": "application/json",
-            "key": "Content-Type"
+            "key": "Content-Type",
+            "value": "application/json"
           }
         ],
         "body": {

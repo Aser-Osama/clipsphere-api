@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth.routes');
 const protect = require('./middleware/protect');
 const restrictTo = require('./middleware/restrictTo');
 const adminRoutes = require('./routes/admin.routes');
+const userRoutes = require('./routes/user.routes');
 
 const swaggerSpec = swaggerJsdoc({
   definition: {
@@ -42,6 +43,8 @@ app.use(mongoSanitize());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/users', userRoutes);
+
 
 
 

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-
 const protect = require('../middleware/protect');
 const restrictTo = require('../middleware/restrictTo');
+const mongoose = require('mongoose');
 
 router.get('/health', protect, restrictTo('admin'), (req, res) => {
   res.json({
@@ -10,7 +10,7 @@ router.get('/health', protect, restrictTo('admin'), (req, res) => {
     data: {
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      message: 'Admin route working'
+      dbStatus: mongoose.connection.readyState
     }
   });
 });
