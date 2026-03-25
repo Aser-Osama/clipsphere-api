@@ -24,18 +24,13 @@ const restrictTo = require('../middleware/restrictTo');
  *   post:
  *     tags: [Videos]
  *     summary: Create a new video (metadata only)
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - title
- *               - videoURL
- *               - duration
  *             required:
  *               - title
  *               - videoURL
@@ -49,8 +44,8 @@ const restrictTo = require('../middleware/restrictTo');
  *                 type: string
  *               duration:
  *                 type: number
- *                 description: Must be less than 300 seconds
- *                 maximum: 299
+ *                 description: Must be less than or equal to 300 seconds
+ *                 maximum: 300
  *               status:
  *                 type: string
  *                 enum: [public, private, flagged]
@@ -103,9 +98,8 @@ router.get('/', videoController.getVideos);
  * /videos/{id}:
  *   patch:
  *     tags: [Videos]
- *     summary: Update video title or description
- *     security:
- *       - bearerAuth: []
+ *     summary: Update video title/description
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -154,8 +148,7 @@ router.patch('/:id', protect, videoController.updateVideo);
  *   delete:
  *     tags: [Videos]
  *     summary: Delete a video (owner or admin)
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -197,8 +190,7 @@ router.delete('/:id', protect, videoController.deleteVideo);
  *   post:
  *     tags: [Reviews]
  *     summary: Add a review to a video
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -216,7 +208,7 @@ router.delete('/:id', protect, videoController.deleteVideo);
  *               - rating
  *             properties:
  *               rating:
- *                 type: integer
+ *                 type: number
  *                 minimum: 1
  *                 maximum: 5
  *               comment:

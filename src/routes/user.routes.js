@@ -18,7 +18,7 @@ const followerController = require('../controllers/follower.controller');
  *   post:
  *     tags: [Users]
  *     summary: Follow a user
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -46,7 +46,7 @@ router.post('/:id/follow', protect, followerController.followUser);
  *   delete:
  *     tags: [Users]
  *     summary: Unfollow a user
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -128,7 +128,7 @@ router.get('/:id/following', followerController.getFollowing);
  *   patch:
  *     tags: [Users]
  *     summary: Update notification preferences
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -179,7 +179,7 @@ router.patch('/preferences', protect, userController.updatePreferences);
  *   get:
  *     tags: [Users]
  *     summary: Get current user's profile
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     responses:
  *       200:
  *         description: User profile
@@ -201,7 +201,7 @@ router.get('/me', protect, userController.getMe);
  *   patch:
  *     tags: [Users]
  *     summary: Update current user's profile
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
