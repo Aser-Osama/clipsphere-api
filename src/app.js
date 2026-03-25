@@ -7,7 +7,7 @@ const { AppError, errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth.routes');
 const protect = require('./middleware/protect');
 const restrictTo = require('./middleware/restrictTo');
-const adminRoutes = require('./routes/admin.routes');
+const adminRoutes = require('./routes/adminRouter');
 const userRoutes = require('./routes/user.routes');
 const videoRoutes = require('./routes/video.routes');
 
@@ -23,15 +23,31 @@ const swaggerSpec = swaggerJsdoc({
     servers: [{ url: '/api/v1' }],
     components: {
       securitySchemes: {
-        bearerAuth: {
+        BearerAuth: {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT'
         }
+      },
+      schemas: {
+        ErrorResponse: {
+          type: 'object',
+          properties: {
+            status: { type: 'string', example: 'error' },
+            message: { type: 'string', example: 'Descriptive error message' }
+          }
+        },
+        SuccessEnvelope: {
+          type: 'object',
+          properties: {
+            status: { type: 'string', example: 'success' },
+            data: { type: 'object', description: 'Response payload' }
+          }
+        }
       }
     }
   },
-  apis: ['./src/routes/*.js', './src/app.js']
+  apis: ['./src/routes/**/*.js', './src/app.js']
 });
 
 
@@ -50,6 +66,29 @@ app.use('/api/v1/videos', videoRoutes);
 
 
 
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Health
+ *     description: Public health check endpoints
+ *   - name: Documentation
+ *     description: API documentation endpoints
+ */
+
+/**
+ * @swagger
+ * /api-docs:
+ *   get:
+ *     servers:
+ *       - url: http://localhost:5000
+ *     tags: [Documentation]
+ *     summary: Swagger UI — interactive API documentation
+ *     description: Browse and test all ClipSphere API endpoints. Authorize with a JWT Bearer token using the Authorize button to access protected routes.
+ *     responses:
+ *       200:
+ *         description: Swagger UI HTML page
+ */
 
 /**
  * @swagger
