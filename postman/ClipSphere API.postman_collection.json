@@ -924,21 +924,19 @@
               "  pm.response.to.have.status(200);",
               "});",
               "",
-              "pm.test('Response has success status', function () {",
-              "  const responseBodyJson = pm.response.json();",
-              "  pm.expect(responseBodyJson.status).to.equal('success');",
+              "pm.test('Response status is success', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.status).to.equal('success');",
               "});",
               "",
-              "pm.test('Response data has uptime', function () {",
-              "  const responseBodyJson = pm.response.json();",
-              "  pm.expect(responseBodyJson.data).to.have.property('uptime');",
-              "  pm.expect(responseBodyJson.data.uptime).to.be.a('number');",
+              "pm.test('dbStatus is connected', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data.dbStatus).to.equal('connected');",
               "});",
               "",
-              "pm.test('Response data has memory usage', function () {",
-              "  const responseBodyJson = pm.response.json();",
-              "  pm.expect(responseBodyJson.data).to.have.property('memory');",
-              "  pm.expect(responseBodyJson.data.memory).to.be.an('object');",
+              "pm.test('memoryUsage object exists', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data.memoryUsage).to.be.an('object');",
               "});"
             ]
           }
@@ -970,6 +968,457 @@
           ]
         },
         "description": "Requires an admin token in {{token}}. Log in as a user with role:admin first to populate {{token}}."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Health - User Access (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 403', function () {",
+              "  pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "health"
+          ]
+        },
+        "description": "Requires a regular user token in {{userToken}} and should return 403."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Health - No Token (401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "health"
+          ]
+        },
+        "description": "No token should return 401."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Stats - Admin Access (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has required keys', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data).to.have.property('totalUsers');",
+              "  pm.expect(body.data).to.have.property('totalVideos');",
+              "  pm.expect(body.data).to.have.property('totalTips');",
+              "  pm.expect(body.data).to.have.property('mostActiveUsers');",
+              "});",
+              "",
+              "pm.test('totalTips is 0', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data.totalTips).to.equal(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "stats"
+          ]
+        },
+        "description": "Requires an admin token in {{token}} and returns aggregated stats."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Stats - User Access (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 403', function () {",
+              "  pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "stats"
+          ]
+        },
+        "description": "Requires a regular user token in {{userToken}} and should return 403."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin User Status - Deactivate (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('User becomes inactive', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data.active).to.equal(false);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"suspended\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "users",
+            "{{userId}}",
+            "status"
+          ]
+        },
+        "description": "Requires an admin token and deactivates target user via status=suspended."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin User Status - Reactivate (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('User becomes active', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data.active).to.equal(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"active\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "users",
+            "{{userId}}",
+            "status"
+          ]
+        },
+        "description": "Requires an admin token and re-activates target user via status=active."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin User Status - User Access (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 403', function () {",
+              "  pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"banned\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "users",
+            "{{userId}}",
+            "status"
+          ]
+        },
+        "description": "Requires a regular user token in {{userToken}} and should return 403."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Moderation - Admin Access (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Moderation keys exist', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.data).to.have.property('flagged');",
+              "  pm.expect(body.data).to.have.property('lowRated');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/moderation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "moderation"
+          ]
+        },
+        "description": "Requires an admin token and returns moderation queue."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Moderation - User Access (403)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 403', function () {",
+              "  pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/admin/moderation",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "admin",
+            "moderation"
+          ]
+        },
+        "description": "Requires a regular user token in {{userToken}} and should return 403."
       },
       "response": []
     },
@@ -1091,6 +1540,10 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:5000"
+    },
+    {
+      "key": "userToken",
+      "value": ""
     }
   ]
 }
