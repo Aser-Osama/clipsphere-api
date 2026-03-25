@@ -129,5 +129,8 @@ Collection:
 ```
 postman/
 ```
+## Documentation
+
+- ER Diagram: docs/er-diagram.png
 
 
