@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "docs:codegen": "node scripts/generate-openapi.js",
+    "docs:site": "node scripts/build-swagger-site.js",
+    "docs:build": "npm run docs:codegen && npm run docs:site",
     "deps:up": "docker compose up -d mongo",
     "deps:down": "docker compose down",
     "deps:logs": "docker compose logs -f mongo",
@@ -27,6 +30,7 @@
   "homepage": "https://github.com/rghdasalah/clipsphere-api#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^4.22.1",
     "express-mongo-sanitize": "^2.2.0",

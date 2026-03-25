@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const swaggerUi = require('swagger-ui-express');
@@ -13,7 +14,41 @@ const videoRoutes = require('./routes/video.routes');
 
 const app = express();
 
+const isDev = process.env.NODE_ENV !== 'production';
+
+const defaultCorsOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5000'
+];
+
+const githubIoOriginPattern = /^https:\/\/[a-z0-9-]+\.github\.io$/i;
+
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim()).filter(Boolean)
+  : defaultCorsOrigins;
+
+const corsOptions = {
+  origin(origin, callback) {
+    // Requests from tools like curl/Postman may have no Origin header.
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    if (isDev && githubIoOriginPattern.test(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin not allowed by CORS: ${origin}`));
+  },
+  credentials: true
+};
+
 app.use(express.json());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(morgan('dev'));
 app.use(mongoSanitize());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
