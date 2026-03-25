@@ -19,7 +19,7 @@ const protect = require('../middleware/protect');
  *   post:
  *     tags: [Videos]
  *     summary: Create a new video (metadata only)
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -75,7 +75,7 @@ router.get('/', videoController.getVideos);
  *   patch:
  *     tags: [Videos]
  *     summary: Update video title/description
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,7 +110,7 @@ router.patch('/:id', protect, videoController.updateVideo);
  *   delete:
  *     tags: [Videos]
  *     summary: Delete a video (owner or admin)
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
@@ -136,7 +136,7 @@ router.delete('/:id', protect, videoController.deleteVideo);
  *   post:
  *     tags: [Reviews]
  *     summary: Add a review to a video
- *     security: [{ bearerAuth: [] }]
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: id
