@@ -14,7 +14,11 @@ Required environment variables:
 PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/clipsphere
 JWT_SECRET=your_secret_key
+CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:5000
 ```
+
+`CORS_ORIGINS` is optional, but recommended when using Swagger UI from GitHub Pages so browser `Execute` requests are allowed.
+In development (`NODE_ENV` not set to `production`), any `https://*.github.io` origin is allowed automatically.
 
 ## Setup
 
@@ -61,6 +65,39 @@ npm run deps:down
 API documentation is available at:
 
 http://localhost:5000/api-docs
+
+This repo can also publish static Swagger docs to GitHub Pages.
+
+Generate OpenAPI JSON from code annotations:
+
+```bash
+npm run docs:codegen
+```
+
+Build static pages content:
+
+```bash
+npm run docs:build
+```
+
+Optional: set a custom backend URL for the generated static docs:
+
+```bash
+OPENAPI_SERVER_URL=http://localhost:5000 npm run docs:build
+```
+
+Swagger UI will show a single editable backend URL field (defaulting to `OPENAPI_SERVER_URL` or `http://localhost:5000`) and append `/api/v1` automatically.
+
+Generated files:
+
+- `docs/openapi.json` (code-generated OpenAPI file)
+- `docs-site/index.html` and `docs-site/openapi.json` (GitHub Pages artifact)
+
+GitHub Actions workflow:
+
+- `.github/workflows/pages-swagger.yml`
+- Runs on push to `main`/`master` and deploys `docs-site` to GitHub Pages.
+- You can enable Pages in repository settings and select GitHub Actions as the source.
 
 ## Postman
 
