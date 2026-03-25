@@ -22,7 +22,12 @@ followerSchema.index({ followerId: 1, followingId: 1 }, { unique: true });
 // Prevent self-follow
 followerSchema.pre('save', function () {
   if (this.followerId.equals(this.followingId)) {
-    throw new Error('Cannot follow yourself');
+    const err = new Error('Cannot follow yourself');
+    err.name = 'ValidationError';
+    err.errors = {
+      followerId: { message: 'Cannot follow yourself' }
+    };
+    throw err;
   }
 });
 

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
+const validate = require('../middleware/validate');
+const { registerSchema, loginSchema } = require('../validators/auth.validators');
 
 /**
  * @swagger
@@ -68,7 +70,7 @@ const authController = require('../controllers/auth.controller');
  *       409:
  *         description: Email already in use
  */
-router.post('/register', authController.register);
+router.post('/register', validate(registerSchema), authController.register);
 
 /**
  * @swagger
@@ -123,6 +125,6 @@ router.post('/register', authController.register);
  *       401:
  *         description: Invalid email or password
  */
-router.post('/login', authController.login);
+router.post('/login', validate(loginSchema), authController.login);
 
 module.exports = router;

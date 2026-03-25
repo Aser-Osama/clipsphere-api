@@ -2,7 +2,15 @@ const express = require('express');
 const router = express.Router();
 const videoController = require('../controllers/video.controller');
 const protect = require('../middleware/protect');
-const restrictTo = require('../middleware/restrictTo');
+const validate = require('../middleware/validate');
+const {
+  createVideoSchema,
+  updateVideoSchema,
+  reviewSchema,
+  listVideosQuerySchema,
+  objectIdParamSchema
+} = require('../validators/video.validators');
+const { ensureVideoOwnerForUpdate, ensureVideoOwnerOrAdminForDelete } = require('../middleware/videoOwnership');
 
 /**
  * @swagger
@@ -44,6 +52,7 @@ const restrictTo = require('../middleware/restrictTo');
  *                 type: string
  *               duration:
  *                 type: number
+ *                 exclusiveMinimum: 0
  *                 description: Must be less than or equal to 300 seconds
  *                 maximum: 300
  *               status:
@@ -67,7 +76,7 @@ const restrictTo = require('../middleware/restrictTo');
  *       401:
  *         description: Unauthorized
  */
-router.post('/', protect, videoController.createVideo);
+router.post('/', protect, validate(createVideoSchema), videoController.createVideo);
 
 /**
  * @swagger
@@ -75,6 +84,20 @@ router.post('/', protect, videoController.createVideo);
  *   get:
  *     tags: [Videos]
  *     summary: List all public videos
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Optional page number for feed pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Optional page size for feed pagination
  *     responses:
  *       200:
  *         description: Array of public videos
@@ -90,8 +113,10 @@ router.post('/', protect, videoController.createVideo);
  *                   type: array
  *                   items:
  *                     type: object
+ *       400:
+ *         description: Invalid pagination query parameters
  */
-router.get('/', videoController.getVideos);
+router.get('/', validate(listVideosQuerySchema, 'query'), videoController.getVideos);
 
 /**
  * @swagger
@@ -113,6 +138,7 @@ router.get('/', videoController.getVideos);
  *         application/json:
  *           schema:
  *             type: object
+ *             minProperties: 1
  *             properties:
  *               title:
  *                 type: string
@@ -140,7 +166,7 @@ router.get('/', videoController.getVideos);
  *       404:
  *         description: Video not found
  */
-router.patch('/:id', protect, videoController.updateVideo);
+router.patch('/:id', protect, validate(objectIdParamSchema, 'params'), ensureVideoOwnerForUpdate, validate(updateVideoSchema), videoController.updateVideo);
 
 /**
  * @swagger
@@ -182,7 +208,7 @@ router.patch('/:id', protect, videoController.updateVideo);
  *       404:
  *         description: Video not found
  */
-router.delete('/:id', protect, videoController.deleteVideo);
+router.delete('/:id', protect, validate(objectIdParamSchema, 'params'), ensureVideoOwnerOrAdminForDelete, videoController.deleteVideo);
 
 /**
  * @swagger
@@ -233,8 +259,8 @@ router.delete('/:id', protect, videoController.deleteVideo);
  *       404:
  *         description: Video not found
  *       409:
- *         description: Duplicate review for this video
+ *         description: Duplicate review from the same user for this video
  */
-router.post('/:id/reviews', protect, videoController.addReview);
+router.post('/:id/reviews', protect, validate(objectIdParamSchema, 'params'), validate(reviewSchema), videoController.addReview);
 
 module.exports = router;

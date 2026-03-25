@@ -1,13 +1,19 @@
 const Video = require('../models/Video');
 const Review = require('../models/Review');
+const User = require('../models/User');
 const { AppError } = require('../middleware/errorHandler');
+const notificationService = require('./notification.service');
 
 exports.createVideo = async (userId, data) => {
   return Video.create({ ...data, owner: userId });
 };
 
-exports.getVideos = async () => {
-  return Video.find({ status: 'public' }).populate('owner', 'username avatarKey');
+exports.getVideos = async (page = 1, limit = 20) => {
+  const skip = (page - 1) * limit;
+  return Video.find({ status: 'public' })
+    .populate('owner', 'username avatarKey')
+    .skip(skip)
+    .limit(limit);
 };
 
 exports.updateVideo = async (videoId, updates) => {
@@ -30,5 +36,16 @@ exports.addReview = async (userId, videoId, data) => {
   const video = await Video.findById(videoId);
   if (!video) throw new AppError('Video not found', 404);
 
-  return Review.create({ ...data, user: userId, video: videoId });
+  const review = await Review.create({ ...data, user: userId, video: videoId });
+  const videoOwner = await User.findById(video.owner);
+
+  await notificationService.handlePreferenceAwareNotification({
+    recipientUser: videoOwner,
+    actorId: userId,
+    type: 'comment',
+    preferenceKey: 'comments',
+    videoId: video._id
+  });
+
+  return review;
 };

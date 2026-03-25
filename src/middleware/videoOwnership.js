@@ -1,27 +1,31 @@
 const Video = require('../models/Video');
-const { AppError } = require('./errorHandler');
+const { AppError, asyncWrapper } = require('./errorHandler');
 
-exports.ensureVideoOwnerForUpdate = async (user, videoId) => {
-  const video = await Video.findById(videoId);
+exports.ensureVideoOwnerForUpdate = asyncWrapper(async (req, res, next) => {
+  const video = await Video.findById(req.params.id);
   if (!video) {
-    throw new AppError('Video not found', 404);
+    return next(new AppError('Video not found', 404));
   }
 
-  if (video.owner.toString() !== user.id.toString()) {
-    throw new AppError('You can only update your own videos', 403);
+  if (video.owner.toString() !== req.user.id.toString()) {
+    return next(new AppError('You can only update your own videos', 403));
   }
-};
 
-exports.ensureVideoOwnerOrAdminForDelete = async (user, videoId) => {
-  const video = await Video.findById(videoId);
+  next();
+});
+
+exports.ensureVideoOwnerOrAdminForDelete = asyncWrapper(async (req, res, next) => {
+  const video = await Video.findById(req.params.id);
   if (!video) {
-    throw new AppError('Video not found', 404);
+    return next(new AppError('Video not found', 404));
   }
 
-  const isOwner = video.owner.toString() === user.id.toString();
-  const isAdmin = user.role === 'admin';
+  const isOwner = video.owner.toString() === req.user.id.toString();
+  const isAdmin = req.user.role === 'admin';
 
   if (!isOwner && !isAdmin) {
-    throw new AppError('Not authorized to delete this video', 403);
+    return next(new AppError('Not authorized to delete this video', 403));
   }
-};
+
+  next();
+});

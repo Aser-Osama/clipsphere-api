@@ -5,12 +5,18 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30
     },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Invalid email address']
     },
     password: {
       type: String,
@@ -30,6 +36,7 @@ const userSchema = new mongoose.Schema(
     },
     accountStatus: {
       type: String,
+      enum: ['active', 'suspended', 'banned'],
       default: 'active'
     },
     notificationPreferences: {

@@ -10,7 +10,8 @@
     "deps:down": "docker compose down",
     "deps:logs": "docker compose logs -f mongo",
     "dev:with-deps": "npm run deps:up && npm run dev",
-    "test": "echo \"No tests configured yet\""
+    "test": "node scripts/seed-test-admin.js && newman run postman/ClipSphere_Phase1_Final.postman_collection.json -e \"postman/ClipSphere Local.postman_environment.json\" --env-var baseUrl=http://localhost:5000",
+    "test:seed": "node scripts/seed-test-admin.js"
   },
   "repository": {
     "type": "git",

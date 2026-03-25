@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "2243fac5-a3f6-4ff2-9d0b-adf56febdcd7",
+    "_postman_id": "d1335231-2516-4997-83e9-b8b933669235",
     "name": "ClipSphere Phase1 Final",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "44220921"
+    "_exporter_id": "39617378"
   },
   "item": [
     {
@@ -256,6 +256,7 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
                   "pm.test('Status code is 200', function () {",
                   "  pm.response.to.have.status(200);",
@@ -270,6 +271,7 @@
                   "  const responseBodyJson = pm.response.json();",
                   "  pm.expect(responseBodyJson.data.token).to.be.a('string');",
                   "  pm.environment.set('token', responseBodyJson.data.token);",
+                  "  pm.collectionVariables.set('userToken', responseBodyJson.data.token);",
                   "  pm.environment.set('userId', responseBodyJson.data.user.id);",
                   "});",
                   "",
@@ -278,18 +280,8 @@
                   "  pm.expect(responseBodyJson.data.user).to.have.property('id');",
                   "  pm.expect(responseBodyJson.data.user).to.have.property('email');",
                   "  pm.expect(responseBodyJson.data.user).to.have.property('role');",
-                  "});",
-                  "const responseBodyJson = pm.response.json();",
-                  "if (responseBodyJson?.data?.token) {",
-                  "  pm.environment.set(\"token\", responseBodyJson.data.token);",
-                  "}",
-                  "if (responseBodyJson?.data?.user?.id) {",
-                  "  pm.environment.set(\"userId\", responseBodyJson.data.user.id);",
-                  "}"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                  "});"
+                ]
               }
             }
           ],
@@ -390,7 +382,59 @@
           "response": []
         },
         {
-          "name": "Protected Route - No Token (401)",
+          "name": "Login - Non-existent Email (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('error');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"nonexistent@test.com\", \"password\": \"secret1234\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile - No Token (401)",
           "event": [
             {
               "listen": "test",
@@ -411,27 +455,24 @@
           ],
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/protected",
+              "raw": "{{baseUrl}}/api/v1/users/me",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "protected"
+                "api",
+                "v1",
+                "users",
+                "me"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Protected Route - With Token (200)",
+          "name": "Get My Profile - With Token (200)",
           "event": [
             {
               "script": {
@@ -447,8 +488,8 @@
                   "",
                   "pm.test('Response includes user object', function () {",
                   "  const responseBodyJson = pm.response.json();",
-                  "  pm.expect(responseBodyJson.data.user).to.be.an('object');",
-                  "  pm.expect(responseBodyJson.data.user).to.have.property('id');",
+                  "  pm.expect(responseBodyJson.data).to.be.an('object');",
+                  "  pm.expect(responseBodyJson.data).to.have.property('_id');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -476,12 +517,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/protected",
+              "raw": "{{baseUrl}}/api/v1/users/me",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "protected"
+                "api",
+                "v1",
+                "users",
+                "me"
               ]
             }
           },
@@ -498,11 +542,16 @@
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('User object returned', () => pm.response.json().data.username);"
-                ],
-                "type": "text/javascript"
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('User object returned', function () {",
+                  "  pm.expect(pm.response.json().data).to.have.property('username');",
+                  "});"
+                ]
               }
             }
           ],
@@ -534,28 +583,32 @@
           "name": "Update My Profile",
           "event": [
             {
-              "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Updated username present', () => pm.response.json().data.username === 'newname');"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "const ts = Date.now();\r",
+                  "const ts = Date.now();",
                   "pm.environment.set('newUsername', 'user_' + ts);"
                 ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
+                "type": "text/javascript"
+              },
+              "listen": "prerequest"
+            },
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Profile updated', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('success');",
+                  "  pm.expect(body.data).to.have.property('username');",
+                  "  pm.expect(body.data).to.have.property('bio');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
             }
           ],
           "request": {
@@ -595,14 +648,19 @@
           "name": "Get Public Profile",
           "event": [
             {
-              "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Public profile has username', () => pm.response.json().data.username);"
-                ],
-                "type": "text/javascript"
-              }
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Public profile has username', function () {",
+                  "  pm.expect(pm.response.json().data).to.have.property('username');",
+                  "});"
+                ]
+              },
+              "listen": "test"
             }
           ],
           "request": {
@@ -624,17 +682,87 @@
           "response": []
         },
         {
-          "name": "Follow User",
+          "name": "Register Second User (201)",
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.environment.set('secondEmail', 'second_' + ts + '@test.com');",
+                  "pm.environment.set('secondUsername', 'second_' + ts);"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 201', () => pm.response.code === 201);",
-                  "pm.test('Followed message returned', () => pm.response.json().message === 'Followed');"
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Second user created and ID stored', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('success');",
+                  "  pm.environment.set('secondUserId', body.data.user.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"{{secondUsername}}\", \"email\": \"{{secondEmail}}\", \"password\": \"secret1234\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Follow User",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Follow success', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('success');",
+                  "});"
                 ],
                 "type": "text/javascript"
-              }
+              },
+              "listen": "test"
             }
           ],
           "request": {
@@ -644,6 +772,51 @@
                 "key": "Authorization",
                 "value": "Bearer {{token}}",
                 "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{secondUserId}}/follow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{secondUserId}}",
+                "follow"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Self-Follow Prevention (400)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Self-follow prevented', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('error');",
+                  "  pm.expect(body.message).to.include('cannot follow yourself');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "value": "Bearer {{token}}",
+                "key": "Authorization"
               }
             ],
             "url": {
@@ -663,56 +836,22 @@
           "response": []
         },
         {
-          "name": "Unfollow User",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Unfollowed message returned', () => pm.response.json().message === 'Unfollowed');"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/unfollow",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "users",
-                "{{userId}}",
-                "unfollow"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "List Followers",
           "event": [
             {
-              "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Followers array returned', () => Array.isArray(pm.response.json().data));"
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Followers array returned', function () {",
+                  "  pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});"
                 ],
                 "type": "text/javascript"
-              }
+              },
+              "listen": "test"
             }
           ],
           "request": {
@@ -725,7 +864,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/followers",
+              "raw": "{{baseUrl}}/api/v1/users/{{secondUserId}}/followers",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -733,7 +872,7 @@
                 "api",
                 "v1",
                 "users",
-                "{{userId}}",
+                "{{secondUserId}}",
                 "followers"
               ]
             }
@@ -744,14 +883,19 @@
           "name": "List Following",
           "event": [
             {
-              "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Following array returned', () => Array.isArray(pm.response.json().data));"
-                ],
-                "type": "text/javascript"
-              }
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Following array returned', function () {",
+                  "  pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});"
+                ]
+              },
+              "listen": "test"
             }
           ],
           "request": {
@@ -774,6 +918,51 @@
                 "users",
                 "{{userId}}",
                 "following"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unfollow User",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Unfollow success', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/{{secondUserId}}/unfollow",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "{{secondUserId}}",
+                "unfollow"
               ]
             }
           },
@@ -827,7 +1016,19 @@
           "response": []
         },
         {
-          "name": "Update Another User Profile (Forbidden)",
+          "name": "Update User Status - User Token (Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403', () => pm.response.code === 403);",
+                  "pm.test('Error message present', () => pm.response.json().message.includes('permission'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -844,33 +1045,24 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{ \"username\": \"hackedname\" }"
+              "raw": "{ \"status\": \"suspended\" }"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/v1/users/{{userId}}/updateMe",
+              "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}/status",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "v1",
+                "admin",
                 "users",
                 "{{userId}}",
-                "updateMe"
+                "status"
               ]
             }
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 403', () => pm.response.code === 403);",
-                  "pm.test('Error message present', () => pm.response.json().message.includes('own profile'));"
-                ]
-              }
-            }
-          ]
+          "response": []
         }
       ]
     },
@@ -879,6 +1071,30 @@
       "item": [
         {
           "name": "Create Video",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Video created', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('success');",
+                  "  pm.expect(body.data.title).to.equal('Test Video');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.environment.set('videoId', body.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -909,22 +1125,49 @@
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Create Video - Duration > 300s (400)",
           "event": [
             {
               "listen": "test",
               "script": {
+                "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status code is 201', () => pm.response.code === 201);",
-                  "pm.test('Video created', () => pm.response.json().data.title === 'Test Video');"
+                  "pm.test('Status code is 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Validation error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('error');",
+                  "});"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "List Videos",
+          ],
           "request": {
-            "method": "GET",
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"Too Long Video\", \"description\": \"Exceeds limit\", \"videoURL\": \"long.mp4\", \"duration\": 500}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/api/v1/videos",
               "host": [
@@ -937,20 +1180,63 @@
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "List Videos",
           "event": [
             {
-              "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Array returned', () => Array.isArray(pm.response.json().data));"
-                ]
-              }
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Array returned', function () {",
+                  "  pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
             }
-          ]
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/videos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "videos"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Video",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Title updated', function () {",
+                  "  pm.expect(pm.response.json().data.title).to.equal('Updated Title');",
+                  "});"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
           "request": {
             "method": "PATCH",
             "header": [
@@ -982,56 +1268,27 @@
               ]
             }
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Title updated', () => pm.response.json().data.title === 'Updated Title');"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Delete Video",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/videos/{{videoId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "videos",
-                "{{videoId}}"
-              ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Video deleted message', () => pm.response.json().message === 'Video deleted');"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Add Review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Review created', function () {",
+                  "  pm.expect(pm.response.json().data.rating).to.equal(5);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -1064,17 +1321,103 @@
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Duplicate Review (409)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Duplicate review error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('error');",
+                  "  pm.expect(body.message).to.include('already reviewed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"rating\": 3, \"comment\": \"Trying again\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/videos/{{videoId}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "videos",
+                "{{videoId}}",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Video",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 201', () => pm.response.code === 201);",
-                  "pm.test('Review created', () => pm.response.json().data.rating === 5);"
-                ]
+                  "pm.test('Status code is 200', () => pm.response.code === 200);",
+                  "pm.test('Video deleted message', () => pm.response.json().data.message === 'Video deleted');"
+                ],
+                "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/videos/{{videoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "videos",
+                "{{videoId}}"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1082,7 +1425,61 @@
       "name": "Admin",
       "item": [
         {
-          "name": "Admin Only - User Token (403)",
+          "name": "Admin Login (200)",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Admin token stored', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.equal('success');",
+                  "  pm.expect(body.data.token).to.be.a('string');",
+                  "  pm.environment.set('adminToken', body.data.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"admin@clipsphere.test\", \"password\": \"AdminPass123!\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Health - User Token (403)",
           "event": [
             {
               "listen": "test",
@@ -1121,12 +1518,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/admin-only",
+              "raw": "{{baseUrl}}/api/v1/admin/health",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "admin-only"
+                "api",
+                "v1",
+                "admin",
+                "health"
               ]
             },
             "description": "Uses a regular user token (role: user). Expects 403 — only admins can access this route."
@@ -1134,7 +1534,7 @@
           "response": []
         },
         {
-          "name": "Admin Only - Admin Token (200)",
+          "name": "Admin Health - Admin Token (200)",
           "event": [
             {
               "listen": "test",
@@ -1149,9 +1549,9 @@
                   "  pm.expect(responseBodyJson.status).to.equal('success');",
                   "});",
                   "",
-                  "pm.test('Response has welcome admin message', function () {",
+                  "pm.test('Response includes admin health payload', function () {",
                   "  const responseBodyJson = pm.response.json();",
-                  "  pm.expect(responseBodyJson.data.message).to.equal('Welcome admin');",
+                  "  pm.expect(responseBodyJson.data).to.have.property('dbStatus');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -1164,7 +1564,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{token}}",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -1173,17 +1573,19 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/admin-only",
+              "raw": "{{baseUrl}}/api/v1/admin/health",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "admin-only"
+                "api",
+                "v1",
+                "admin",
+                "health"
               ]
             },
             "description": "Requires an admin token in {{token}}. Log in as a user with role:admin first to populate {{token}}."
@@ -1226,7 +1628,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{token}}",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -1234,9 +1636,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "value": "Bearer {{adminToken}}",
+                "key": "Authorization"
               }
             ],
             "url": {
@@ -1276,7 +1677,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{userToken}}",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1309,7 +1710,15 @@
           "name": "Admin Health - No Token (401)",
           "event": [
             {
-              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.request.headers.remove('Authorization');"
+                ]
+              },
+              "listen": "prerequest"
+            },
+            {
               "script": {
                 "type": "text/javascript",
                 "exec": [
@@ -1317,16 +1726,20 @@
                   "  pm.response.to.have.status(401);",
                   "});"
                 ]
-              }
+              },
+              "listen": "test"
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "description": "disabled",
+                "value": ""
               }
             ],
             "url": {
@@ -1379,7 +1792,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{token}}",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -1388,8 +1801,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
@@ -1429,7 +1841,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{userToken}}",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1484,7 +1896,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{token}}",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -1493,13 +1905,11 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
+                "value": "application/json"
               },
               {
                 "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "body": {
@@ -1550,7 +1960,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{token}}",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -1558,14 +1968,12 @@
             "method": "PATCH",
             "header": [
               {
-                "key": "Content-Type",
                 "value": "application/json",
-                "type": "text"
+                "key": "Content-Type"
               },
               {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "value": "Bearer {{adminToken}}",
+                "key": "Authorization"
               }
             ],
             "body": {
@@ -1611,7 +2019,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{userToken}}",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]
@@ -1678,7 +2086,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{token}}",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -1686,9 +2094,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
+                "value": "Bearer {{adminToken}}",
+                "key": "Authorization"
               }
             ],
             "url": {
@@ -1728,7 +2135,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{userToken}}",
+                  "value": "{{token}}",
                   "type": "string"
                 }
               ]

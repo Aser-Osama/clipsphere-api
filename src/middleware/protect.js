@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { AppError } = require('./errorHandler');
+const { getAccountStateError } = require('../utils/accountState');
 
 const protect = async (req, res, next) => {
   let token;
@@ -28,8 +29,9 @@ const protect = async (req, res, next) => {
       return next(new AppError('User no longer exists', 401));
     }
 
-    if (!user.active) {
-      return next(new AppError('Account is deactivated', 401));
+    const accountStateError = getAccountStateError(user);
+    if (accountStateError) {
+      return next(accountStateError);
     }
 
     // attach user to request

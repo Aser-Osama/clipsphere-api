@@ -1,9 +1,5 @@
 const adminService = require('../services/adminService');
-const { AppError, asyncWrapper } = require('../middleware/errorHandler');
-const { objectIdParamSchema, setUserStatusSchema } = require('../validators/admin.validators');
-
-const formatValidationIssues = (issues) =>
-  issues.map((i) => (i.path.length ? `${i.path.join('.')}: ${i.message}` : i.message)).join(', ');
+const { asyncWrapper } = require('../middleware/errorHandler');
 
 exports.getHealth = asyncWrapper(async (req, res) => {
   const health = adminService.getHealth();
@@ -24,16 +20,7 @@ exports.getStats = asyncWrapper(async (req, res) => {
 });
 
 exports.setUserStatus = asyncWrapper(async (req, res) => {
-  const paramResult = objectIdParamSchema.safeParse(req.params);
-  if (!paramResult.success) throw new AppError(formatValidationIssues(paramResult.error.issues), 400);
-
-  const bodyResult = setUserStatusSchema.safeParse(req.body);
-  if (!bodyResult.success) throw new AppError(formatValidationIssues(bodyResult.error.issues), 400);
-
-  const { id } = paramResult.data;
-  const { status } = bodyResult.data;
-
-  const updatedUser = await adminService.setUserStatus(id, status);
+  const updatedUser = await adminService.setUserStatus(req.params.id, req.body.status);
 
   res.status(200).json({
     status: 'success',

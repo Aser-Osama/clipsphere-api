@@ -1,7 +1,9 @@
 const express = require('express');
 const protect = require('../middleware/protect');
 const restrictTo = require('../middleware/restrictTo');
+const validate = require('../middleware/validate');
 const adminController = require('../controllers/adminController');
+const { objectIdParamSchema, setUserStatusSchema } = require('../validators/admin.validators');
 
 const router = express.Router();
 
@@ -204,7 +206,7 @@ router.get('/stats', protect, restrictTo('admin'), adminController.getStats);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch('/users/:id/status', protect, restrictTo('admin'), adminController.setUserStatus);
+router.patch('/users/:id/status', protect, restrictTo('admin'), validate(objectIdParamSchema, 'params'), validate(setUserStatusSchema), adminController.setUserStatus);
 
 /**
  * @swagger
