@@ -2,16 +2,21 @@ const express = require('express');
 const router = express.Router();
 const videoController = require('../controllers/video.controller');
 const protect = require('../middleware/protect');
+const restrictTo = require('../middleware/restrictTo');
 
 /**
  * @swagger
  * tags:
- *   - name: Videos
- *     description: Video metadata management endpoints
- *   - name: Reviews
- *     description: Review endpoints for videos
+ *   name: Videos
+ *   description: Video metadata management endpoints
  */
 
+/**
+ * @swagger
+ * tags:
+ *   name: Reviews
+ *   description: Review endpoints for videos
+ */
 
 /**
  * @swagger
@@ -19,7 +24,8 @@ const protect = require('../middleware/protect');
  *   post:
  *     tags: [Videos]
  *     summary: Create a new video (metadata only)
- *     security: [{ bearerAuth: [] }]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -30,22 +36,41 @@ const protect = require('../middleware/protect');
  *               - title
  *               - videoURL
  *               - duration
+ *             required:
+ *               - title
+ *               - videoURL
+ *               - duration
  *             properties:
- *               title: { type: string }
- *               description: { type: string }
- *               videoURL: { type: string }
- *               duration: { type: number, maximum: 300 }
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               videoURL:
+ *                 type: string
+ *               duration:
+ *                 type: number
+ *                 description: Must be less than 300 seconds
+ *                 maximum: 299
+ *               status:
+ *                 type: string
+ *                 enum: [public, private, flagged]
  *     responses:
  *       201:
- *         description: Video created
+ *         description: Video created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
  *       400:
- *         description: Validation error
+ *         description: Validation error or invalid duration
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Resource not found
  */
 router.post('/', protect, videoController.createVideo);
 
@@ -57,15 +82,19 @@ router.post('/', protect, videoController.createVideo);
  *     summary: List all public videos
  *     responses:
  *       200:
- *         description: Array of videos
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Resource not found
+ *         description: Array of public videos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
  */
 router.get('/', videoController.getVideos);
 
@@ -74,13 +103,16 @@ router.get('/', videoController.getVideos);
  * /videos/{id}:
  *   patch:
  *     tags: [Videos]
- *     summary: Update video title/description
- *     security: [{ bearerAuth: [] }]
+ *     summary: Update video title or description
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
+ *         description: Video ID
  *     requestBody:
  *       required: true
  *       content:
@@ -88,17 +120,29 @@ router.get('/', videoController.getVideos);
  *           schema:
  *             type: object
  *             properties:
- *               title: { type: string }
- *               description: { type: string }
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Updated video
+ *         description: Updated video successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
  *       400:
  *         description: Validation error or invalid ID format
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Not video owner
+ *         description: Only the owner can update this video
  *       404:
  *         description: Video not found
  */
@@ -110,15 +154,32 @@ router.patch('/:id', protect, videoController.updateVideo);
  *   delete:
  *     tags: [Videos]
  *     summary: Delete a video (owner or admin)
- *     security: [{ bearerAuth: [] }]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
+ *         description: Video ID
  *     responses:
  *       200:
- *         description: Video deleted
+ *         description: Video deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Video deleted
  *       400:
  *         description: Invalid ID format
  *       401:
@@ -136,12 +197,15 @@ router.delete('/:id', protect, videoController.deleteVideo);
  *   post:
  *     tags: [Reviews]
  *     summary: Add a review to a video
- *     security: [{ bearerAuth: [] }]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema: { type: string }
+ *         schema:
+ *           type: string
+ *         description: Video ID
  *     requestBody:
  *       required: true
  *       content:
@@ -151,17 +215,29 @@ router.delete('/:id', protect, videoController.deleteVideo);
  *             required:
  *               - rating
  *             properties:
- *               rating: { type: integer, minimum: 1, maximum: 5 }
- *               comment: { type: string }
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comment:
+ *                 type: string
  *     responses:
  *       201:
- *         description: Review created
+ *         description: Review created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
  *       400:
- *         description: Validation error or invalid ID format
+ *         description: Validation error, invalid ID format, or invalid rating
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: Video not found
  *       409:
