@@ -1,55 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
-const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const { AppError, errorHandler } = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth.routes');
-const protect = require('./middleware/protect');
-const restrictTo = require('./middleware/restrictTo');
 const adminRoutes = require('./routes/adminRouter');
 const userRoutes = require('./routes/user.routes');
 const videoRoutes = require('./routes/video.routes');
-
-
-const swaggerSpec = swaggerJsdoc({
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'ClipSphere API',
-      version: '1.0.0',
-      description: 'Backend API for the ClipSphere project'
-    },
-    servers: [{ url: '/api/v1' }],
-    components: {
-      securitySchemes: {
-        BearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      },
-      schemas: {
-        ErrorResponse: {
-          type: 'object',
-          properties: {
-            status: { type: 'string', example: 'error' },
-            message: { type: 'string', example: 'Descriptive error message' }
-          }
-        },
-        SuccessEnvelope: {
-          type: 'object',
-          properties: {
-            status: { type: 'string', example: 'success' },
-            data: { type: 'object', description: 'Response payload' }
-          }
-        }
-      }
-    }
-  },
-  apis: ['./src/routes/**/*.js', './src/app.js']
-});
-
 
 
 
@@ -117,8 +75,7 @@ app.use('/api/v1/videos', videoRoutes);
  *                       type: string
  *                       format: date-time
  */
-// health route
-app.get('/api/v1/health', (req, res) => {
+const sendHealth = (req, res) => {
   res.json({
     status: 'success',
     data: {
@@ -126,29 +83,11 @@ app.get('/api/v1/health', (req, res) => {
       timestamp: new Date()
     }
   });
-});
+};
 
-app.get('/error', (req, res) => {  //for test
-  throw new Error('Test error');
-});
-
-app.get('/protected', protect, (req, res) => {
-  res.json({
-    status: 'success',
-    data: {
-      user: req.user
-    }
-  });
-});
-
-app.get('/admin-only', protect, restrictTo('admin'), (req, res) => {
-  res.json({
-    status: 'success',
-    data: {
-      message: 'Welcome admin'
-    }
-  });
-});
+// Support both the spec's public probe and the legacy Phase 1 collection path.
+app.get('/health', sendHealth);
+app.get('/api/v1/health', sendHealth);
 
 // 404
 app.use((req, res, next) => {
