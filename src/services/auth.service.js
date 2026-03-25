@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { AppError } = require('../middleware/errorHandler');
+const { getAccountStateError } = require('../utils/accountState');
 
 exports.register = async (data) => {
   const { username, email, password } = data;
@@ -60,6 +61,11 @@ exports.login = async (data) => {
 
   if (!isMatch) {
     throw new AppError('Invalid email or password', 401);
+  }
+
+  const accountStateError = getAccountStateError(user);
+  if (accountStateError) {
+    throw accountStateError;
   }
 
   // generate token

@@ -1,6 +1,7 @@
 const Follower = require('../models/Follower');
 const User = require('../models/User');
 const { AppError } = require('../middleware/errorHandler');
+const notificationService = require('./notification.service');
 
 exports.followUser = async (followerId, followingId) => {
   const followedUser = await User.findById(followingId);
@@ -10,32 +11,12 @@ exports.followUser = async (followerId, followingId) => {
 
   try {
     const followDoc = await Follower.create({ followerId, followingId });
-    const notifications = [];
-
-    const prefs = followedUser.notificationPreferences;
-    if (prefs?.inApp?.followers) {
-      notifications.push({
-        type: 'inApp',
-        user: followingId,
-        message: 'Stub: In-app follower notification'
-      });
-    }
-
-    if (prefs?.email?.followers) {
-      notifications.push({
-        type: 'email',
-        user: followingId,
-        message: 'Stub: Email follower notification queued'
-      });
-    }
-
-    if (notifications.length > 0) {
-      console.log('Follow notification stubs', {
-        followerId,
-        followingId,
-        notifications
-      });
-    }
+    const notifications = await notificationService.handlePreferenceAwareNotification({
+      recipientUser: followedUser,
+      actorId: followerId,
+      type: 'follower',
+      preferenceKey: 'followers'
+    });
 
     return { followDoc, notifications };
   } catch (err) {

@@ -30,10 +30,30 @@ npm install
 cp .env.example .env
 ```
 
-3. Start the API in development mode:
+3. Start MongoDB:
+
+If you already have MongoDB running locally, keep using that. Otherwise, the bundled Docker Compose file will start a local MongoDB instance for the Phase 1 app:
+
+```bash
+npm run deps:up
+```
+
+4. Start the API in development mode:
 
 ```bash
 npm run dev
+```
+
+Or start both together:
+
+```bash
+npm run dev:with-deps
+```
+
+When you are done with the Docker-based MongoDB dependency:
+
+```bash
+npm run deps:down
 ```
 
 ## Swagger
@@ -59,5 +79,3 @@ Import steps:
 ## Documentation
 
 - ER Diagram: `docs/er-diagram.jpeg`
-
-

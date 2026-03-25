@@ -148,7 +148,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status code is 201', () => pm.response.code === 201);",
-                  "pm.test('Followed message returned', () => pm.response.json().message === 'Followed');"
+                  "pm.test('Followed message returned', () => pm.response.json().data.message === 'Followed');"
                 ],
                 "type": "text/javascript"
               }
@@ -187,7 +187,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status code is 200', () => pm.response.code === 200);",
-                  "pm.test('Unfollowed message returned', () => pm.response.json().message === 'Unfollowed');"
+                  "pm.test('Unfollowed message returned', () => pm.response.json().data.message === 'Unfollowed');"
                 ],
                 "type": "text/javascript"
               }
@@ -331,8 +331,8 @@
           },
           "response": []
         },
-        {
-        "name": "Update Another User Profile (Forbidden)",
+      {
+        "name": "Update User Status - User Token (Forbidden)",
         "request": {
           "method": "PATCH",
           "header": [
@@ -341,12 +341,12 @@
           ],
           "body": {
             "mode": "raw",
-            "raw": "{ \"username\": \"hackedname\" }"
+            "raw": "{ \"status\": \"suspended\" }"
           },
           "url": {
-            "raw": "{{baseUrl}}/api/v1/users/{{userId}}/updateMe",
+            "raw": "{{baseUrl}}/api/v1/admin/users/{{userId}}/status",
             "host": ["{{baseUrl}}"],
-            "path": ["api","v1","users","{{userId}}","updateMe"]
+            "path": ["api","v1","admin","users","{{userId}}","status"]
           }
         },
         "event": [
@@ -355,7 +355,7 @@
             "script": {
               "exec": [
                 "pm.test('Status code is 403', () => pm.response.code === 403);",
-                "pm.test('Error message present', () => pm.response.json().message.includes('own profile'));"
+                "pm.test('Error message present', () => pm.response.json().message.includes('permission'));"
               ]
             }
           }
@@ -753,12 +753,15 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/protected",
+          "raw": "{{baseUrl}}/api/v1/users/me",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
-            "protected"
+            "api",
+            "v1",
+            "users",
+            "me"
           ]
         }
       },
@@ -781,8 +784,8 @@
               "",
               "pm.test('Response includes user object', function () {",
               "  const responseBodyJson = pm.response.json();",
-              "  pm.expect(responseBodyJson.data.user).to.be.an('object');",
-              "  pm.expect(responseBodyJson.data.user).to.have.property('id');",
+              "  pm.expect(responseBodyJson.data).to.be.an('object');",
+              "  pm.expect(responseBodyJson.data).to.have.property('_id');",
               "});"
             ],
             "type": "text/javascript"
@@ -804,19 +807,22 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/protected",
+          "raw": "{{baseUrl}}/api/v1/users/me",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
-            "protected"
+            "api",
+            "v1",
+            "users",
+            "me"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "Admin Only - User Token (403)",
+      "name": "Admin Health - User Token (403)",
       "event": [
         {
           "listen": "test",
@@ -849,12 +855,15 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin-only",
+          "raw": "{{baseUrl}}/api/v1/admin/health",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
-            "admin-only"
+            "api",
+            "v1",
+            "admin",
+            "health"
           ]
         },
         "description": "Uses a regular user token (role: user). Expects 403 — only admins can access this route."
@@ -862,7 +871,7 @@
       "response": []
     },
     {
-      "name": "Admin Only - Admin Token (200)",
+      "name": "Admin Health - Admin Token (200)",
       "event": [
         {
           "listen": "test",
@@ -877,9 +886,9 @@
               "  pm.expect(responseBodyJson.status).to.equal('success');",
               "});",
               "",
-              "pm.test('Response has welcome admin message', function () {",
+              "pm.test('Response includes admin health payload', function () {",
               "  const responseBodyJson = pm.response.json();",
-              "  pm.expect(responseBodyJson.data.message).to.equal('Welcome admin');",
+              "  pm.expect(responseBodyJson.data).to.have.property('dbStatus');",
               "});"
             ],
             "type": "text/javascript"
@@ -900,12 +909,15 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin-only",
+          "raw": "{{baseUrl}}/api/v1/admin/health",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
-            "admin-only"
+            "api",
+            "v1",
+            "admin",
+            "health"
           ]
         },
         "description": "Requires an admin token in {{token}}. Log in as a user with role:admin first to populate {{token}}."
@@ -1503,7 +1515,7 @@
             "listen": "test",
             "script": { "exec": [
               "pm.test('Status code is 200', () => pm.response.code === 200);",
-              "pm.test('Video deleted message', () => pm.response.json().message === 'Video deleted');"
+              "pm.test('Video deleted message', () => pm.response.json().data.message === 'Video deleted');"
             ]}
           }
         ]

@@ -2,8 +2,17 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
 const protect = require('../middleware/protect');
+const validate = require('../middleware/validate');
+const { updateMeSchema, preferencesSchema, objectIdParamSchema } = require('../validators/user.validators');
 
 const followerController = require('../controllers/follower.controller');
+
+const checkNotSelf = (req, res, next) => {
+  if (req.params.id === req.user.id.toString()) {
+    return res.status(400).json({ status: 'error', message: 'You cannot follow yourself' });
+  }
+  next();
+};
 
 /**
  * @swagger
@@ -33,12 +42,10 @@ const followerController = require('../controllers/follower.controller');
  *         description: Invalid ID format or self-follow attempt
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
-router.post('/:id/follow', protect, followerController.followUser);
+router.post('/:id/follow', protect, validate(objectIdParamSchema, 'params'), checkNotSelf, followerController.followUser);
 
 /**
  * @swagger
@@ -61,12 +68,10 @@ router.post('/:id/follow', protect, followerController.followUser);
  *         description: Invalid ID format
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found or not following
  */
-router.delete('/:id/unfollow', protect, followerController.unfollowUser);
+router.delete('/:id/unfollow', protect, validate(objectIdParamSchema, 'params'), followerController.unfollowUser);
 
 /**
  * @swagger
@@ -86,14 +91,10 @@ router.delete('/:id/unfollow', protect, followerController.unfollowUser);
  *         description: Followers list
  *       400:
  *         description: Invalid ID format
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
-router.get('/:id/followers', followerController.getFollowers);
+router.get('/:id/followers', validate(objectIdParamSchema, 'params'), followerController.getFollowers);
 
 /**
  * @swagger
@@ -113,14 +114,10 @@ router.get('/:id/followers', followerController.getFollowers);
  *         description: Following list
  *       400:
  *         description: Invalid ID format
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
-router.get('/:id/following', followerController.getFollowing);
+router.get('/:id/following', validate(objectIdParamSchema, 'params'), followerController.getFollowing);
 
 /**
  * @swagger
@@ -165,12 +162,10 @@ router.get('/:id/following', followerController.getFollowing);
  *         description: Validation error
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
-router.patch('/preferences', protect, userController.updatePreferences);
+router.patch('/preferences', protect, validate(preferencesSchema), userController.updatePreferences);
 
 
 /**
@@ -183,12 +178,8 @@ router.patch('/preferences', protect, userController.updatePreferences);
  *     responses:
  *       200:
  *         description: User profile
- *       400:
- *         description: Validation error
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
@@ -228,12 +219,10 @@ router.get('/me', protect, userController.getMe);
  *         description: Validation error
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
-router.patch('/updateMe', protect, userController.updateMe);
+router.patch('/updateMe', protect, validate(updateMeSchema), userController.updateMe);
 
 /**
  * @swagger
@@ -253,13 +242,9 @@ router.patch('/updateMe', protect, userController.updateMe);
  *         description: Public profile
  *       400:
  *         description: Invalid ID format
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
  *       404:
  *         description: User not found
  */
-router.get('/:id', userController.getUserById);
+router.get('/:id', validate(objectIdParamSchema, 'params'), userController.getUserById);
 
 module.exports = router;
