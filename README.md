@@ -1,133 +1,59 @@
 # ClipSphere API
 
-Backend API for the ClipSphere project.
+ClipSphere API is a Node.js/Express backend for a social short-video platform, with JWT authentication, RBAC-protected admin endpoints, user/follow graph flows, video metadata and reviews, Swagger API documentation, and a consolidated Postman collection for Phase 1 verification.
 
-Built using Node.js, Express, and MongoDB.
-This repo contains the core backend setup, authentication system, and shared infrastructure for the team.
+## Prerequisites
 
----
+- Node.js 18+ (recommended)
+- MongoDB running locally or remotely
+- Environment variables configured in `.env`
 
-## What’s implemented
+Required environment variables:
 
-* Auth: register & login
-* JWT authentication
-* protect middleware (auth)
-* restrictTo middleware (RBAC)
-* Global error handler
-* Admin health endpoint
-* Swagger docs
-* Postman collection
-* Zod validation for auth
-
----
-
-## Project structure
-
-```
-src/
-  routes/
-  controllers/
-  services/
-  models/
-  middleware/
-  config/
-  validators/
-```
-
----
-
-## Quick start
-
-Clone the repo:
-
-```
-git clone https://github.com/rghdasalah/clipsphere-api.git
-cd clipsphere-api
-```
-
-Install dependencies:
-
-```
-npm install
-```
-
-Create `.env` from the example:
-
-```
-cp .env.example .env
-```
-
-Default `.env.example` values:
-
-```
+```env
 PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/clipsphere
 JWT_SECRET=your_secret_key
 ```
 
-Bring up dependencies (MongoDB via Docker):
+## Setup
 
-```
-npm run deps:up
+1. Install dependencies:
+
+```bash
+npm install
 ```
 
-Run API in development mode:
+2. Copy environment template:
 
+```bash
+cp .env.example .env
 ```
+
+3. Start the API in development mode:
+
+```bash
 npm run dev
 ```
 
-Or run both in one command:
-
-```
-npm run dev:with-deps
-```
-
-Run API in production mode:
-
-```
-npm start
-```
-
-Stop Docker dependencies:
-
-```
-npm run deps:down
-```
-
-View Mongo logs:
-
-```
-npm run deps:logs
-```
-
----
-
-## API
-
-Base URL:
-
-```
-http://localhost:5000/api/v1
-```
-
-
----
-
 ## Swagger
 
-```
-http://localhost:5000/api-docs
-```
+API documentation is available at:
 
----
+http://localhost:5000/api-docs
 
 ## Postman
 
-Collection:
+Use the final merged Phase 1 files in `postman/`:
 
-```
-postman/
-```
+- Collection: `ClipSphere_Phase1_Final.postman_collection.json`
+- Environment: `ClipSphere Local.postman_environment.json`
+
+Import steps:
+
+1. Open Postman and click Import.
+2. Import the collection file and the environment file.
+3. Select the `ClipSphere Local` environment.
+4. Set `baseUrl` (for example `http://localhost:5000`) and run Login to populate `token` automatically.
 
 
