@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/services/api";
 import type { Video } from "@/types";
@@ -23,23 +23,50 @@ export default function VideoDetailPage({ params }: PageProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [video, setVideo] = useState<Video | null>(null);
+  const [likeCount, setLikeCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [stub, setStub] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
+  // Stream URL state
+  const [presignedUrl, setPresignedUrl] = useState("");
+  const [streamError, setStreamError] = useState(false);
+  const [videoUnavailable, setVideoUnavailable] = useState(false);
+  const retryRef = useRef(0);
+  const playerWrapperRef = useRef<HTMLDivElement>(null);
+
   const isOwnerOrAdmin =
     user?._id === video?.owner?._id || user?.role === "admin";
+
+  const fetchStreamUrl = useCallback(async (): Promise<string> => {
+    const { data } = await api.get(`/videos/${id}/stream`);
+    return data.data?.url ?? "";
+  }, [id]);
 
   useEffect(() => {
     let cancelled = false;
 
-    const fetchVideo = async () => {
+    const load = async () => {
       try {
         const { data } = await api.get(`/videos/${id}`);
-        if (!cancelled) {
-          setVideo(data.data ?? null);
-          setStub(false);
+        if (cancelled) return;
+        setVideo(data.data?.video ?? null);
+        setLikeCount(data.data?.likeCount ?? 0);
+        setStub(false);
+
+        // Fetch presigned stream URL
+        try {
+          const url = await fetchStreamUrl();
+          if (!cancelled) {
+            setPresignedUrl(url);
+            setStreamError(false);
+          }
+        } catch {
+          if (!cancelled) {
+            setPresignedUrl("");
+            setStreamError(true);
+          }
         }
       } catch {
         if (!cancelled) {
@@ -51,11 +78,37 @@ export default function VideoDetailPage({ params }: PageProps) {
       }
     };
 
-    fetchVideo();
+    load();
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, fetchStreamUrl]);
+
+  // Re-fetch presigned URL on <video> error (max 1 retry)
+  useEffect(() => {
+    const wrapper = playerWrapperRef.current;
+    if (!wrapper || !presignedUrl) return;
+
+    const videoEl = wrapper.querySelector("video");
+    if (!videoEl) return;
+
+    const handleError = async () => {
+      if (retryRef.current < 1) {
+        retryRef.current += 1;
+        try {
+          const url = await fetchStreamUrl();
+          setPresignedUrl(url);
+        } catch {
+          setVideoUnavailable(true);
+        }
+      } else {
+        setVideoUnavailable(true);
+      }
+    };
+
+    videoEl.addEventListener("error", handleError);
+    return () => videoEl.removeEventListener("error", handleError);
+  }, [presignedUrl, fetchStreamUrl]);
 
   if (loading) {
     return (
@@ -70,14 +123,45 @@ export default function VideoDetailPage({ params }: PageProps) {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left column: Player + Metadata */}
         <div className="space-y-4 lg:col-span-2">
-          <VideoPlayer
-            url={video?.videoURL ?? ""}
-            title={video?.title ?? "Video"}
-          />
+          {videoUnavailable ? (
+            <div className="w-full overflow-hidden rounded-xl bg-black">
+              <div className="flex aspect-video items-center justify-center">
+                <p className="text-sm text-white/70">Video unavailable</p>
+              </div>
+            </div>
+          ) : streamError && !presignedUrl ? (
+            <div className="w-full overflow-hidden rounded-xl bg-black">
+              <div className="flex aspect-video items-center justify-center">
+                <div className="text-center text-white">
+                  <svg
+                    className="mx-auto mb-3 h-12 w-12 animate-pulse opacity-60"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0013.5 5.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"
+                    />
+                  </svg>
+                  <p className="text-sm text-white/70">Video processing…</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div ref={playerWrapperRef}>
+              <VideoPlayer
+                url={presignedUrl}
+                title={video?.title ?? "Video"}
+              />
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="flex items-center gap-3">
-            <LikeButton videoId={id} initialLikeCount={video?.likeCount ?? 0} />
+            <LikeButton videoId={id} initialLikeCount={likeCount} />
             <ShareButton videoId={id} title={video?.title} />
           </div>
 

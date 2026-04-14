@@ -1,5 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Video } from "@/types";
+import { getAvatarUrl } from "@/utils/avatarUrl";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -30,8 +34,18 @@ interface VideoCardProps {
 }
 
 export default function VideoCard({ video }: VideoCardProps) {
-  // Deterministic gradient from video id
   const hue = video._id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!video.owner?.avatarKey) return;
+    let cancelled = false;
+    getAvatarUrl(video.owner._id).then((url) => {
+      if (!cancelled) setAvatarUrl(url);
+    });
+    return () => { cancelled = true; };
+  }, [video.owner._id, video.owner?.avatarKey]);
 
   return (
     <Link
@@ -54,7 +68,20 @@ export default function VideoCard({ video }: VideoCardProps) {
           {video.title}
         </h3>
 
-        <p className="text-xs text-gray-500">{video.owner.username}</p>
+        <div className="flex items-center gap-1.5">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt=""
+              className="h-6 w-6 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-700">
+              {video.owner.username?.charAt(0).toUpperCase() ?? "?"}
+            </div>
+          )}
+          <p className="text-xs text-gray-500">{video.owner.username}</p>
+        </div>
 
         <div className="flex items-center gap-3 text-xs text-gray-500">
           <span>{formatCount(video.viewsCount)} views</span>
