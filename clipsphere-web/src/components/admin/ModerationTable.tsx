@@ -1,0 +1,110 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+
+interface ModerationTableProps {
+  flaggedVideos: any[];
+  lowRatedVideos: any[];
+}
+
+type Tab = "flagged" | "lowRated";
+
+export default function ModerationTable({ flaggedVideos, lowRatedVideos }: ModerationTableProps) {
+  const [tab, setTab] = useState<Tab>("flagged");
+
+  const videos = tab === "flagged" ? flaggedVideos : lowRatedVideos;
+
+  return (
+    <div className="rounded-xl border border-brand-100 bg-white shadow-sm">
+      {/* Tab Switcher */}
+      <div className="flex border-b border-brand-100">
+        <button
+          onClick={() => setTab("flagged")}
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            tab === "flagged"
+              ? "border-b-2 border-brand-600 text-brand-700 bg-brand-50/50"
+              : "text-brand-400 hover:text-brand-600"
+          }`}
+        >
+          Flagged ({flaggedVideos.length})
+        </button>
+        <button
+          onClick={() => setTab("lowRated")}
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            tab === "lowRated"
+              ? "border-b-2 border-brand-600 text-brand-700 bg-brand-50/50"
+              : "text-brand-400 hover:text-brand-600"
+          }`}
+        >
+          Low Rated ({lowRatedVideos.length})
+        </button>
+      </div>
+
+      {/* Table */}
+      {videos.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-brand-400">
+          <svg className="mb-2 h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          <p className="text-sm">
+            {tab === "flagged" ? "No flagged videos" : "No low-rated videos"}
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-brand-100 text-xs uppercase tracking-wide text-brand-500">
+                <th className="px-4 py-3 font-medium">Title</th>
+                <th className="px-4 py-3 font-medium">Owner</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Rating</th>
+                <th className="px-4 py-3 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {videos.map((video: any, i: number) => (
+                <tr
+                  key={video._id ?? i}
+                  className="border-b border-brand-50 even:bg-brand-50/30 hover:bg-brand-50 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium text-brand-900 max-w-[200px] truncate">
+                    {video.title ?? "Untitled"}
+                  </td>
+                  <td className="px-4 py-3 text-brand-600">
+                    {typeof video.owner === "object" ? video.owner.username : video.owner ?? "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        video.status === "flagged"
+                          ? "bg-red-100 text-red-700"
+                          : video.status === "public"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {video.status ?? "unknown"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-brand-700">
+                    {video.averageRating != null ? video.averageRating.toFixed(1) : "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/video/${video._id}`}
+                      className="text-brand-600 hover:text-brand-800 font-medium text-xs hover:underline"
+                    >
+                      View →
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
