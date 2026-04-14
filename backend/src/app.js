@@ -12,6 +12,9 @@ const videoRoutes = require('./routes/video.routes');
 const videoUploadRoutes = require('./routes/videoUpload.routes');
 const videoStreamRoutes = require('./routes/videoStream.routes');
 const avatarRoutes = require('./routes/avatar.routes');
+const videoReadRoutes = require('./routes/videoRead.routes');
+const userVideosRoutes = require('./routes/userVideos.routes');
+const reviewRoutes = require('./routes/review.routes');
 
 
 
@@ -57,11 +60,15 @@ app.use(mongoSanitize());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/users', userVideosRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/videos', videoUploadRoutes);
 app.use('/api/v1/videos', videoStreamRoutes);
 app.use('/api/v1/videos', videoRoutes);
+// videoReadRoutes AFTER videoRoutes: GET /:id must not shadow /following, /trending
+app.use('/api/v1/videos', videoReadRoutes);
 app.use('/api/v1/users', avatarRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
 
 
 
