@@ -3,6 +3,8 @@ const Review = require('../models/Review');
 const User = require('../models/User');
 const { AppError } = require('../middleware/errorHandler');
 const notificationService = require('./notification.service');
+const { deleteObject } = require('./storage.service');
+const { VIDEOS_BUCKET } = require('../config/s3');
 
 exports.createVideo = async (userId, data) => {
   return Video.create({ ...data, owner: userId });
@@ -29,7 +31,16 @@ exports.deleteVideo = async (videoId) => {
   const video = await Video.findById(videoId);
   if (!video) throw new AppError('Video not found', 404);
 
+  const objectKey = video.key;
   await video.deleteOne();
+
+  if (objectKey) {
+    try {
+      await deleteObject(VIDEOS_BUCKET, objectKey);
+    } catch (err) {
+      console.error(`Failed to delete S3 object ${objectKey}:`, err.message);
+    }
+  }
 };
 
 exports.addReview = async (userId, videoId, data) => {

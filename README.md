@@ -67,6 +67,74 @@ cd backend
 npm run deps:down
 ```
 
+## MinIO Object Storage
+
+ClipSphere uses MinIO as an S3-compatible object storage service for video and avatar files.
+
+### Setup
+
+MinIO is started alongside MongoDB with:
+
+```bash
+cd backend
+npm run deps:up
+```
+
+This starts both MongoDB and MinIO containers.
+
+### MinIO Console
+
+Access the MinIO web console at: http://localhost:9001
+
+Default credentials:
+- Username: `minioadmin`
+- Password: `minioadmin`
+
+### Buckets
+
+Two buckets are auto-created when the server starts:
+- `clipsphere-videos` — video file storage
+- `clipsphere-avatars` — user avatar storage
+
+### Requirements
+
+**ffmpeg** and **ffprobe** must be installed on the host system for video duration validation:
+
+```bash
+# Ubuntu/Debian
+sudo apt install ffmpeg
+
+# macOS
+brew install ffmpeg
+
+# Verify installation
+ffmpeg -version
+ffprobe -version
+```
+
+### Media API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/videos/upload` | Bearer token | Upload video file + metadata |
+| GET | `/api/v1/videos/:id/stream` | Public | Get presigned URL for video playback |
+| POST | `/api/v1/users/avatar` | Bearer token | Upload avatar image |
+| GET | `/api/v1/users/:id/avatar` | Public | Get presigned URL for avatar |
+
+### Environment Variables
+
+Add these to `backend/.env` (see `.env.example`):
+
+```env
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_VIDEOS=clipsphere-videos
+MINIO_BUCKET_AVATARS=clipsphere-avatars
+MINIO_USE_SSL=false
+```
+
 ## Swagger
 
 API documentation is available at:
