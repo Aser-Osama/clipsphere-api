@@ -2,11 +2,13 @@
 
 ClipSphere API is a Node.js/Express backend for a social short-video platform, with JWT authentication, RBAC-protected admin endpoints, user/follow graph flows, video metadata and reviews, Swagger API documentation, and a consolidated Postman collection for Phase 1 verification.
 
+The backend application now lives under `backend/` within this repository.
+
 ## Prerequisites
 
 - Node.js 18+ (recommended)
 - MongoDB running locally or remotely
-- Environment variables configured in `.env`
+- Environment variables configured in `backend/.env`
 
 Required environment variables:
 
@@ -25,13 +27,14 @@ In development (`NODE_ENV` not set to `production`), any `https://*.github.io` o
 1. Install dependencies:
 
 ```bash
+cd backend
 npm install
 ```
 
 2. Copy environment template:
 
 ```bash
-cp .env.example .env
+cp backend/.env.example backend/.env
 ```
 
 3. Start MongoDB:
@@ -39,24 +42,28 @@ cp .env.example .env
 If you already have MongoDB running locally, keep using that. Otherwise, the bundled Docker Compose file will start a local MongoDB instance for the Phase 1 app:
 
 ```bash
+cd backend
 npm run deps:up
 ```
 
 4. Start the API in development mode:
 
 ```bash
+cd backend
 npm run dev
 ```
 
 Or start both together:
 
 ```bash
+cd backend
 npm run dev:with-deps
 ```
 
 When you are done with the Docker-based MongoDB dependency:
 
 ```bash
+cd backend
 npm run deps:down
 ```
 
@@ -71,18 +78,21 @@ This repo can also publish static Swagger docs to GitHub Pages.
 Generate OpenAPI JSON from code annotations:
 
 ```bash
+cd backend
 npm run docs:codegen
 ```
 
 Build static pages content:
 
 ```bash
+cd backend
 npm run docs:build
 ```
 
 Optional: set a custom backend URL for the generated static docs:
 
 ```bash
+cd backend
 OPENAPI_SERVER_URL=http://localhost:5000 npm run docs:build
 ```
 
@@ -90,21 +100,21 @@ Swagger UI will show a single editable backend URL field (defaulting to `OPENAPI
 
 Generated files:
 
-- `docs/openapi.json` (code-generated OpenAPI file)
-- `docs-site/index.html` and `docs-site/openapi.json` (GitHub Pages artifact)
+- `backend/docs/openapi.json` (code-generated OpenAPI file)
+- `backend/docs-site/index.html` and `backend/docs-site/openapi.json` (GitHub Pages artifact)
 
 GitHub Actions workflow:
 
 - `.github/workflows/pages-swagger.yml`
-- Runs on push to `main`/`master` and deploys `docs-site` to GitHub Pages.
+- Runs on push to `main`/`master` and deploys `backend/docs-site` to GitHub Pages.
 - You can enable Pages in repository settings and select GitHub Actions as the source.
 
 ## Postman
 
-Use the final merged Phase 1 files in `postman/`:
+Use the final merged Phase 1 files in `backend/postman/`:
 
-- Collection: `ClipSphere_Phase1_Final.postman_collection.json`
-- Environment: `ClipSphere Local.postman_environment.json`
+- Collection: `backend/postman/ClipSphere_Phase1_Final.postman_collection.json`
+- Environment: `backend/postman/ClipSphere Local.postman_environment.json`
 
 Import steps:
 
@@ -115,4 +125,4 @@ Import steps:
 
 ## Documentation
 
-- ER Diagram: `docs/er-diagram.jpeg`
+- ER Diagram: `backend/docs/er-diagram.jpeg`
