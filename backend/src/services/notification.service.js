@@ -1,4 +1,5 @@
 const Notification = require('../models/Notification');
+const emailService = require('./email.service');
 
 const buildNotificationPayload = ({ recipientId, actorId, type, videoId }) => ({
   recipient: recipientId,
@@ -16,8 +17,7 @@ exports.handlePreferenceAwareNotification = async ({
   videoId
 }) => {
   const notifications = {
-    inApp: [],
-    emailQueue: []
+    inApp: []
   };
 
   if (!recipientUser) {
@@ -49,16 +49,7 @@ exports.handlePreferenceAwareNotification = async ({
   }
 
   if (prefs?.email?.[preferenceKey]) {
-    const queuedEmail = {
-      recipient: recipientId,
-      actor: normalizedActorId,
-      type,
-      channel: 'email',
-      ...(videoId ? { video: videoId.toString() } : {})
-    };
-
-    console.info('Email notification queued', queuedEmail);
-    notifications.emailQueue.push(queuedEmail);
+    emailService.sendEngagementEmail(recipientUser, actorId, type, { videoId });
   }
 
   return notifications;

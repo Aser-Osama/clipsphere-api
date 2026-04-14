@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { AppError } = require('../middleware/errorHandler');
 const { getAccountStateError } = require('../utils/accountState');
+const emailService = require('./email.service');
 
 exports.register = async (data) => {
   const { username, email, password } = data;
@@ -27,6 +28,8 @@ exports.register = async (data) => {
     email,
     password: hashedPassword
   });
+
+  emailService.sendWelcomeEmail(user).catch(() => {});
 
   // generate token
   const token = jwt.sign(
