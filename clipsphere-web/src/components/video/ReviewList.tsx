@@ -11,9 +11,10 @@ interface ReviewListProps {
   videoId: string;
   refreshKey: number;
   optimisticReview?: Review | null;
+  onReviewChanged?: () => void;
 }
 
-export default function ReviewList({ videoId, refreshKey, optimisticReview }: ReviewListProps) {
+export default function ReviewList({ videoId, refreshKey, optimisticReview, onReviewChanged }: ReviewListProps) {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,11 +43,11 @@ export default function ReviewList({ videoId, refreshKey, optimisticReview }: Re
         const { data } = await api.get(`/videos/${videoId}/reviews?page=${page}&limit=5`);
         if (!cancelled) {
           if (page === 1) {
-            setReviews(data.data ?? []);
+            setReviews(data.data?.reviews ?? []);
           } else {
-            setReviews((prev) => [...prev, ...(data.data ?? [])]);
+            setReviews((prev) => [...prev, ...(data.data?.reviews ?? [])]);
           }
-          setTotalPages(data.totalPages ?? 1);
+          setTotalPages(data.data?.totalPages ?? 1);
           setUnavailable(false);
         }
       } catch {
@@ -64,6 +65,16 @@ export default function ReviewList({ videoId, refreshKey, optimisticReview }: Re
       cancelled = true;
     };
   }, [videoId, refreshKey, page]);
+
+  const handleReviewUpdated = (updated: Review) => {
+    setReviews((prev) => prev.map((r) => (r._id === updated._id ? updated : r)));
+    onReviewChanged?.();
+  };
+
+  const handleReviewDeleted = (reviewId: string) => {
+    setReviews((prev) => prev.filter((r) => r._id !== reviewId));
+    onReviewChanged?.();
+  };
 
   const showOptimistic = optimisticReview && !cleared;
   const displayedReviews = showOptimistic
@@ -105,6 +116,8 @@ export default function ReviewList({ videoId, refreshKey, optimisticReview }: Re
           key={review._id}
           review={review}
           currentUserId={user?._id}
+          onUpdated={handleReviewUpdated}
+          onDeleted={handleReviewDeleted}
         />
       ))}
       {page < totalPages && (
