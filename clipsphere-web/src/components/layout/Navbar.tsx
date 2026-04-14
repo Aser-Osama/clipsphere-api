@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { getAvatarUrl } from "@/utils/avatarUrl";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?._id) {
+      getAvatarUrl(user._id).then(setAvatarUrl);
+    }
+  }, [user?._id]);
 
   return (
     <nav className="bg-brand-900 text-white shadow-lg">
@@ -29,7 +37,19 @@ export default function Navbar() {
             )}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <Link href={`/profile/${user?._id}`} className="hover:text-brand-300 transition-colors">
+                <Link href={`/profile/${user?._id}`} className="flex items-center gap-2 hover:text-brand-300 transition-colors">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={user?.username ?? ""}
+                      className="h-7 w-7 rounded-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  ) : (
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-bold">
+                      {user?.username?.charAt(0).toUpperCase() ?? "?"}
+                    </span>
+                  )}
                   {user?.username}
                 </Link>
                 <button onClick={logout} className="rounded bg-brand-600 px-3 py-1 text-sm hover:bg-brand-500 transition-colors">

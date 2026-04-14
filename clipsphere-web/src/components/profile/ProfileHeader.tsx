@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import FollowButton from "./FollowButton";
 import type { User } from "@/types";
 
 interface ProfileHeaderProps {
   user: User;
+  avatarUrl?: string | null;
   followersCount: number;
   followingCount: number;
   isFollowing: boolean;
@@ -18,12 +20,15 @@ function getInitials(username: string) {
 
 export default function ProfileHeader({
   user,
+  avatarUrl,
   followersCount,
   followingCount,
   isFollowing,
   onToggleFollow,
   isOwnProfile,
 }: ProfileHeaderProps) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div className="rounded-2xl border border-brand-100 bg-white shadow-sm">
       {/* Banner */}
@@ -32,9 +37,18 @@ export default function ProfileHeader({
       <div className="relative px-6 pb-6">
         {/* Avatar */}
         <div className="-mt-14 flex items-end gap-4 sm:-mt-16">
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-brand-200 text-2xl font-bold text-brand-800 shadow sm:h-28 sm:w-28 sm:text-3xl">
-            {getInitials(user.username)}
-          </div>
+          {avatarUrl && !imgError ? (
+            <img
+              src={avatarUrl}
+              alt={user.username}
+              onError={() => setImgError(true)}
+              className="h-24 w-24 shrink-0 rounded-full border-4 border-white object-cover shadow sm:h-28 sm:w-28"
+            />
+          ) : (
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-brand-200 text-2xl font-bold text-brand-800 shadow sm:h-28 sm:w-28 sm:text-3xl">
+              {getInitials(user.username)}
+            </div>
+          )}
         </div>
 
         {/* Info + Follow */}

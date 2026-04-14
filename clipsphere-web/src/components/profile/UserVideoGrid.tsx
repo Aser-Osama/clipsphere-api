@@ -18,7 +18,7 @@ export default function UserVideoGrid({ userId }: UserVideoGridProps) {
     async function fetchVideos() {
       try {
         const { data } = await api.get(`/users/${userId}/videos`);
-        if (!cancelled) setVideos(data.data ?? []);
+        if (!cancelled) setVideos(data.data?.videos ?? data.data ?? []);
       } catch {
         if (!cancelled) setVideos([]);
       } finally {
