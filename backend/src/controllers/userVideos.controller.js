@@ -1,18 +1,5 @@
-const jwt = require('jsonwebtoken');
 const Video = require('../models/Video');
-const User = require('../models/User');
 const { asyncWrapper } = require('../middleware/errorHandler');
-
-const optionalAuth = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id);
-    }
-  } catch {}
-  next();
-};
 
 /**
  * @swagger
@@ -98,4 +85,4 @@ const getUserVideos = asyncWrapper(async (req, res) => {
   });
 });
 
-module.exports = { optionalAuth, getUserVideos };
+module.exports = { getUserVideos };

@@ -42,8 +42,16 @@ const { AppError, asyncWrapper } = require('../middleware/errorHandler');
 exports.getVideoStream = asyncWrapper(async (req, res) => {
   const video = await Video.findById(req.params.id);
 
-  if (!video || video.status !== 'public') {
+  if (!video) {
     throw new AppError('Video not found', 404);
+  }
+
+  if (video.status !== 'public') {
+    const isOwner = req.user && video.owner.toString() === req.user.id;
+    const isAdmin = req.user && req.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
+      throw new AppError('Video not found', 404);
+    }
   }
 
   if (!video.key) {

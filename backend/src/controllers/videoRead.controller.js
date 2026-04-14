@@ -52,6 +52,14 @@ exports.getVideoById = asyncWrapper(async (req, res) => {
     throw new AppError('Video not found', 404);
   }
 
+  if (video.status !== 'public') {
+    const isOwner = req.user && video.owner._id.toString() === req.user.id;
+    const isAdmin = req.user && req.user.role === 'admin';
+    if (!isOwner && !isAdmin) {
+      throw new AppError('Video not found', 404);
+    }
+  }
+
   const likeCount = await Like.countDocuments({ video: id });
 
   res.json({
