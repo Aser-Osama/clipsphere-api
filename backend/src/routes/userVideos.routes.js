@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { optionalAuth, getUserVideos } = require('../controllers/userVideos.controller');
+const { getUserVideos } = require('../controllers/userVideos.controller');
+const optionalAuth = require('../middleware/optionalAuth');
 const validate = require('../middleware/validate');
 const { videoIdParamSchema } = require('../validators/feed.validators');
 
