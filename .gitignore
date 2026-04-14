@@ -7,5 +7,5 @@ logs/
 dist/
 coverage/
 scripts/test-phase1.js
-docs/openapi.json
-docs-site/
+backend/docs/openapi.json
+backend/docs-site/
