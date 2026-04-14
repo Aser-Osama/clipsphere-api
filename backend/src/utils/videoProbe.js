@@ -5,17 +5,16 @@ const os = require('os');
 const { randomUUID } = require('crypto');
 
 const probeVideo = (buffer) => {
+  const tmpPath = path.join(os.tmpdir(), `clip-${randomUUID()}.tmp`);
+
   return new Promise((resolve, reject) => {
-    const tmpPath = path.join(os.tmpdir(), `clip-${randomUUID()}.tmp`);
-    fs.writeFileSync(tmpPath, buffer);
+    try {
+      fs.writeFileSync(tmpPath, buffer);
+    } catch (writeErr) {
+      return reject(writeErr);
+    }
 
     ffmpeg.ffprobe(tmpPath, (err, metadata) => {
-      try {
-        fs.unlinkSync(tmpPath);
-      } catch (_) {
-        // ignore cleanup error
-      }
-
       if (err) return reject(err);
 
       const videoStream = metadata.streams.find(
@@ -30,6 +29,12 @@ const probeVideo = (buffer) => {
         codec: videoStream.codec_name,
       });
     });
+  }).finally(() => {
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch (_) {
+      // ignore cleanup error
+    }
   });
 };
 
