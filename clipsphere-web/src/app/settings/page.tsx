@@ -1,12 +1,17 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/services/api";
 import type { User } from "@/types";
 import Spinner from "@/components/ui/Spinner";
 import Toast from "@/components/ui/Toast";
 import NotificationToggles from "@/components/profile/NotificationToggles";
+import { getAvatarUrl, invalidateAvatarCache } from "@/utils/avatarUrl";
+import { extractApiMessage } from "@/utils/extractApiMessage";
+
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 type Prefs = User["notificationPreferences"];
 
@@ -20,6 +25,12 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [prefsSaving, setPrefsSaving] = useState(false);
 
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   // Pre-fill form when user loads
@@ -30,6 +41,13 @@ export default function SettingsPage() {
       setPrefs(user.notificationPreferences);
     }
   }, [user]);
+
+  // Fetch current avatar on mount
+  useEffect(() => {
+    if (user?._id) {
+      getAvatarUrl(user._id).then(setAvatarUrl);
+    }
+  }, [user?._id]);
 
   async function handleProfileSubmit(e: FormEvent) {
     e.preventDefault();
@@ -51,13 +69,56 @@ export default function SettingsPage() {
     setPrefsSaving(true);
 
     try {
-      await api.patch("/users/preferences", { notificationPreferences: prefs });
+      await api.patch("/users/preferences", prefs);
       await refreshUser();
       setToast({ message: "Preferences saved!", type: "success" });
     } catch {
       setToast({ message: "Failed to save preferences.", type: "error" });
     } finally {
       setPrefsSaving(false);
+    }
+  }
+
+  function handleAvatarSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setToast({ message: "Please select a JPEG, PNG, or WebP image.", type: "error" });
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setToast({ message: "Image must be smaller than 5 MB.", type: "error" });
+      return;
+    }
+
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  async function handleAvatarUpload() {
+    if (!avatarFile || !user) return;
+    setAvatarSaving(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("avatar", avatarFile);
+      await api.post("/users/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      invalidateAvatarCache(user._id);
+      const newUrl = await getAvatarUrl(user._id);
+      setAvatarUrl(newUrl);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      await refreshUser();
+      setToast({ message: "Avatar updated!", type: "success" });
+    } catch (err) {
+      setToast({ message: extractApiMessage(err), type: "error" });
+    } finally {
+      setAvatarSaving(false);
     }
   }
 
@@ -78,16 +139,39 @@ export default function SettingsPage() {
         <h2 className="mb-4 text-lg font-semibold text-gray-900">Edit Profile</h2>
 
         <form onSubmit={handleProfileSubmit} className="space-y-5">
-          {/* Avatar stub */}
+          {/* Avatar */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Avatar</label>
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-200 text-xl font-bold text-brand-800">
-                {user?.username?.slice(0, 2).toUpperCase() ?? "?"}
-              </div>
+              {avatarPreview || avatarUrl ? (
+                <img
+                  src={avatarPreview ?? avatarUrl!}
+                  alt="Avatar preview"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-brand-200"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-200 text-xl font-bold text-brand-800">
+                  {user?.username?.slice(0, 2).toUpperCase() ?? "?"}
+                </div>
+              )}
               <div>
-                <input type="file" accept="image/*" disabled className="text-sm text-gray-400" />
-                <p className="mt-1 text-xs text-gray-500">Avatar upload coming soon</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarSelect}
+                  className="text-sm text-gray-600"
+                />
+                {avatarFile && (
+                  <button
+                    type="button"
+                    onClick={handleAvatarUpload}
+                    disabled={avatarSaving}
+                    className="mt-2 rounded-lg bg-brand-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {avatarSaving ? "Uploading…" : "Upload Avatar"}
+                  </button>
+                )}
               </div>
             </div>
           </div>

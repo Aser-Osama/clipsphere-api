@@ -7,6 +7,7 @@ import type { User } from "@/types";
 import Spinner from "@/components/ui/Spinner";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import UserVideoGrid from "@/components/profile/UserVideoGrid";
+import { getAvatarUrl } from "@/utils/avatarUrl";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -22,6 +23,7 @@ export default function ProfilePage({ params }: PageProps) {
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const isOwnProfile = currentUser?._id === id;
 
@@ -38,6 +40,9 @@ export default function ProfilePage({ params }: PageProps) {
       setFollowersCount(followersRes.data.results ?? followers.length);
       const following = followingRes.data.data ?? [];
       setFollowingCount(followingRes.data.results ?? following.length);
+
+      const url = await getAvatarUrl(id);
+      setAvatarUrl(url);
 
       // Check if current user is in the followers list
       if (currentUser) {
@@ -92,6 +97,7 @@ export default function ProfilePage({ params }: PageProps) {
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
       <ProfileHeader
         user={user}
+        avatarUrl={avatarUrl}
         followersCount={followersCount}
         followingCount={followingCount}
         isFollowing={isFollowing}
