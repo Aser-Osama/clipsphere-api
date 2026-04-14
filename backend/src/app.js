@@ -9,6 +9,9 @@ const authRoutes = require('./routes/auth.routes');
 const adminRoutes = require('./routes/adminRouter');
 const userRoutes = require('./routes/user.routes');
 const videoRoutes = require('./routes/video.routes');
+const videoUploadRoutes = require('./routes/videoUpload.routes');
+const videoStreamRoutes = require('./routes/videoStream.routes');
+const avatarRoutes = require('./routes/avatar.routes');
 
 
 
@@ -55,7 +58,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/videos', videoUploadRoutes);
+app.use('/api/v1/videos', videoStreamRoutes);
 app.use('/api/v1/videos', videoRoutes);
+app.use('/api/v1/users', avatarRoutes);
 
 
 
