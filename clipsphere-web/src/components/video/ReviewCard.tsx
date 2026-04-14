@@ -41,7 +41,7 @@ export default function ReviewCard({
     setSaving(true);
     setError("");
     try {
-      const { data } = await api.patch(`/api/v1/reviews/${review._id}`, {
+      const { data } = await api.patch(`/reviews/${review._id}`, {
         rating: editRating,
         comment: editComment,
       });
@@ -72,7 +72,7 @@ export default function ReviewCard({
     setDeleting(true);
     setError("");
     try {
-      await api.delete(`/api/v1/reviews/${review._id}`);
+      await api.delete(`/reviews/${review._id}`);
       onDeleted?.(review._id);
     } catch (err: unknown) {
       const status =
