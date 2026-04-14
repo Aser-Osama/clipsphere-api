@@ -11,6 +11,7 @@ const {
   objectIdParamSchema
 } = require('../validators/video.validators');
 const { ensureVideoOwnerForUpdate, ensureVideoOwnerOrAdminForDelete } = require('../middleware/videoOwnership');
+const { feedQuerySchema, videoIdParamSchema } = require('../validators/feed.validators');
 
 /**
  * @swagger
@@ -117,6 +118,105 @@ router.post('/', protect, validate(createVideoSchema), videoController.createVid
  *         description: Invalid pagination query parameters
  */
 router.get('/', validate(listVideosQuerySchema, 'query'), videoController.getVideos);
+
+/**
+ * @swagger
+ * /videos/following:
+ *   get:
+ *     tags: [Videos]
+ *     summary: Get videos from users you follow
+ *     security: [{ BearerAuth: [] }]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *     responses:
+ *       200:
+ *         description: Following feed
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/following', protect, validate(feedQuerySchema, 'query'), videoController.getFollowingFeed);
+
+/**
+ * @swagger
+ * /videos/trending:
+ *   get:
+ *     tags: [Videos]
+ *     summary: Get trending videos sorted by rating
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *     responses:
+ *       200:
+ *         description: Trending feed
+ */
+router.get('/trending', validate(feedQuerySchema, 'query'), videoController.getTrendingFeed);
+
+/**
+ * @swagger
+ * /videos/{id}/like:
+ *   post:
+ *     tags: [Videos]
+ *     summary: Like a video
+ *     security: [{ BearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       201:
+ *         description: Video liked
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Video not found
+ *       409:
+ *         description: Already liked
+ */
+router.post('/:id/like', protect, validate(videoIdParamSchema, 'params'), videoController.likeVideo);
+
+/**
+ * @swagger
+ * /videos/{id}/like:
+ *   delete:
+ *     tags: [Videos]
+ *     summary: Unlike a video
+ *     security: [{ BearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Video unliked
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Like not found
+ */
+router.delete('/:id/like', protect, validate(videoIdParamSchema, 'params'), videoController.unlikeVideo);
 
 /**
  * @swagger
