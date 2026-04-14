@@ -35,7 +35,7 @@ const swaggerSpec = swaggerJsdoc({
       }
     }
   },
-  apis: ['./src/routes/**/*.js', './src/app.js']
+  apis: ['./src/routes/**/*.js', './src/controllers/**/*.js', './src/app.js']
 });
 
 module.exports = swaggerSpec;
