@@ -5,8 +5,15 @@ const mongoose = require('mongoose');
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log('DB connected');
+
+    const { ensureBucketExists } = require('./src/services/storage.service');
+    const { VIDEOS_BUCKET, AVATARS_BUCKET } = require('./src/config/s3');
+    await ensureBucketExists(VIDEOS_BUCKET);
+    await ensureBucketExists(AVATARS_BUCKET);
+    console.log('Storage buckets ready');
+
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
