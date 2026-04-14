@@ -4,6 +4,13 @@ const User = require('../models/User');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>"']/g, (m) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]
+  );
+}
+
 function wrapHtml(title, body) {
   return `<!DOCTYPE html>
 <html>
@@ -31,7 +38,7 @@ exports.sendWelcomeEmail = async (user) => {
     const transporter = await getTransporter();
     const html = wrapHtml(
       'Welcome to ClipSphere!',
-      `<h2 style="margin:0 0 16px;color:#333;">Welcome, ${user.username}!</h2>
+      `<h2 style="margin:0 0 16px;color:#333;">Welcome, ${escapeHtml(user.username)}!</h2>
        <p style="color:#555;line-height:1.6;">
          Thanks for joining ClipSphere. Start exploring, uploading, and sharing amazing videos with the community.
        </p>
@@ -70,15 +77,16 @@ function buildEngagementBody(actorName, type, meta) {
     ? `<a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/video/${meta.videoId}" style="color:#6c63ff;">View video</a>`
     : '';
 
+  const safe = escapeHtml(actorName);
   switch (type) {
     case 'follower':
-      return `<p style="color:#555;line-height:1.6;"><strong>${actorName}</strong> started following you.</p>`;
+      return `<p style="color:#555;line-height:1.6;"><strong>${safe}</strong> started following you.</p>`;
     case 'comment':
-      return `<p style="color:#555;line-height:1.6;"><strong>${actorName}</strong> commented on your video.</p>${videoLink}`;
+      return `<p style="color:#555;line-height:1.6;"><strong>${safe}</strong> commented on your video.</p>${videoLink}`;
     case 'like':
-      return `<p style="color:#555;line-height:1.6;"><strong>${actorName}</strong> liked your video.</p>${videoLink}`;
+      return `<p style="color:#555;line-height:1.6;"><strong>${safe}</strong> liked your video.</p>${videoLink}`;
     default:
-      return `<p style="color:#555;line-height:1.6;">You have a new notification from <strong>${actorName}</strong>.</p>`;
+      return `<p style="color:#555;line-height:1.6;">You have a new notification from <strong>${safe}</strong>.</p>`;
   }
 }
 

@@ -42,14 +42,15 @@ const { asyncWrapper, AppError } = require('../middleware/errorHandler');
 exports.getVideoById = asyncWrapper(async (req, res) => {
   const { id } = req.params;
 
-  const video = await Video.findById(id).populate('owner', 'username avatarKey');
+  const video = await Video.findByIdAndUpdate(
+    id,
+    { $inc: { viewsCount: 1 } },
+    { new: true }
+  ).populate('owner', 'username avatarKey');
 
   if (!video) {
     throw new AppError('Video not found', 404);
   }
-
-  // Increment view count atomically
-  await Video.findByIdAndUpdate(id, { $inc: { viewsCount: 1 } });
 
   const likeCount = await Like.countDocuments({ video: id });
 
