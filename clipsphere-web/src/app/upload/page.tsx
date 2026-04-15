@@ -10,6 +10,7 @@ import Spinner from "@/components/ui/Spinner";
 
 const ACCEPTED_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 const ACCEPT_STRING = "video/mp4,video/webm,video/quicktime";
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB — matches backend multer limit
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -52,6 +53,14 @@ export default function UploadPage() {
     if (!ACCEPTED_TYPES.includes(selected.type)) {
       setFileError(
         `Invalid file type "${selected.type || "unknown"}". Please select an MP4, WebM, or QuickTime video.`
+      );
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    if (selected.size > MAX_FILE_SIZE) {
+      setFileError(
+        `File too large (${formatBytes(selected.size)}). Maximum size is ${formatBytes(MAX_FILE_SIZE)}.`
       );
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
