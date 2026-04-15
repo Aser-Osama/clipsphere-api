@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import api from "@/services/api";
 
@@ -34,9 +34,11 @@ export default function FollowButton({ userId, isFollowing, onToggle }: FollowBu
   }
 
   // Keep optimistic state in sync when parent updates
-  if (optimistic !== isFollowing && !loading) {
-    setOptimistic(isFollowing);
-  }
+  useEffect(() => {
+    if (!loading) {
+      setOptimistic(isFollowing);
+    }
+  }, [isFollowing, loading]);
 
   return (
     <button
