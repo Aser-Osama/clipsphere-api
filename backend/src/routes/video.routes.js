@@ -140,9 +140,34 @@ router.get('/', validate(listVideosQuerySchema, 'query'), videoController.getVid
  *           maximum: 100
  *     responses:
  *       200:
- *         description: Following feed
+ *         description: Paginated feed of videos from followed users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 results:
+ *                   type: integer
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     videos:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                     page:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/following', protect, validate(feedQuerySchema, 'query'), videoController.getFollowingFeed);
 
@@ -166,7 +191,28 @@ router.get('/following', protect, validate(feedQuerySchema, 'query'), videoContr
  *           maximum: 100
  *     responses:
  *       200:
- *         description: Trending feed
+ *         description: Paginated feed of videos sorted by trending score
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 results:
+ *                   type: integer
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     videos:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                     page:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
  */
 router.get('/trending', validate(feedQuerySchema, 'query'), videoController.getTrendingFeed);
 
@@ -186,12 +232,37 @@ router.get('/trending', validate(feedQuerySchema, 'query'), videoController.getT
  *     responses:
  *       201:
  *         description: Video liked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     likeCount:
+ *                       type: integer
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Video not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       409:
  *         description: Already liked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/:id/like', protect, validate(videoIdParamSchema, 'params'), videoController.likeVideo);
 
@@ -211,10 +282,31 @@ router.post('/:id/like', protect, validate(videoIdParamSchema, 'params'), videoC
  *     responses:
  *       200:
  *         description: Video unliked
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     likeCount:
+ *                       type: integer
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Like not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete('/:id/like', protect, validate(videoIdParamSchema, 'params'), videoController.unlikeVideo);
 
