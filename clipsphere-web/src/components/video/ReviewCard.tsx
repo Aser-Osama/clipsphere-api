@@ -46,7 +46,7 @@ export default function ReviewCard({
         comment: editComment,
       });
       const updated: Review =
-        data.data ?? { ...review, rating: editRating, comment: editComment };
+        data.data?.review ?? { ...review, rating: editRating, comment: editComment };
       setDisplayRating(updated.rating);
       setDisplayComment(updated.comment);
       setEditing(false);

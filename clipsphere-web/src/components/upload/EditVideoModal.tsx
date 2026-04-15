@@ -56,7 +56,11 @@ export default function EditVideoModal({
         title: data.title,
         description: data.description,
       });
-      const updated: Video = res.data.data?.video ?? res.data.data ?? res.data;
+      const updated: Video = {
+        ...video,
+        title: data.title,
+        description: data.description,
+      };
       setToast({ message: "Video updated!", type: "success" });
       setTimeout(() => {
         onUpdated(updated);
