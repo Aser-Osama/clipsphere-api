@@ -19,7 +19,7 @@ function formatCount(n: number): string {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <span className="inline-flex items-center gap-0.5 text-xs text-yellow-500" aria-label={`${rating.toFixed(1)} stars`}>
+    <span className="inline-flex items-center gap-0.5 text-xs text-gold" aria-label={`${rating.toFixed(1)} stars`}>
       {Array.from({ length: 5 }, (_, i) => (
         <svg key={i} className="h-3.5 w-3.5" viewBox="0 0 20 20" fill={i < Math.round(rating) ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.5}>
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.176 0l-3.37 2.448c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.063 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" />
@@ -50,21 +50,21 @@ export default function VideoCard({ video }: VideoCardProps) {
   return (
     <Link
       href={`/video/${video._id}`}
-      className="group block overflow-hidden rounded-lg bg-white shadow-sm transition hover:shadow-md"
+      className="group block overflow-hidden rounded-xl bg-surface border border-border transition-all hover:border-border-accent hover:glow-accent animate-fade-in-up"
     >
       {/* Thumbnail placeholder */}
       <div
         className="relative aspect-video"
-        style={{ background: `linear-gradient(135deg, hsl(${hue},70%,65%), hsl(${(hue + 40) % 360},60%,50%))` }}
+        style={{ background: `linear-gradient(135deg, hsl(${hue},50%,35%), hsl(${(hue + 40) % 360},40%,25%))` }}
       >
-        <span className="absolute bottom-1.5 right-1.5 rounded bg-black/75 px-1.5 py-0.5 text-xs font-medium text-white">
+        <span className="absolute bottom-1.5 right-1.5 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-brand-400">
           {formatDuration(video.duration)}
         </span>
       </div>
 
       {/* Info */}
       <div className="p-3 space-y-1">
-        <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-brand-600">
+        <h3 className="line-clamp-2 text-sm font-semibold text-text-strong group-hover:text-brand-400">
           {video.title}
         </h3>
 
@@ -73,17 +73,17 @@ export default function VideoCard({ video }: VideoCardProps) {
             <img
               src={avatarUrl}
               alt=""
-              className="h-6 w-6 rounded-full object-cover"
+              className="h-6 w-6 rounded-full object-cover ring-1 ring-border"
             />
           ) : (
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-700">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500/20 text-[10px] font-semibold text-brand-400">
               {video.owner.username?.charAt(0).toUpperCase() ?? "?"}
             </div>
           )}
-          <p className="text-xs text-gray-500">{video.owner.username}</p>
+          <p className="text-xs text-text-muted">{video.owner.username}</p>
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-gray-500">
+        <div className="flex items-center gap-3 text-xs text-text-muted">
           <span>{formatCount(video.viewsCount)} views</span>
           {video.likeCount != null && <span>{formatCount(video.likeCount)} likes</span>}
           {video.averageRating != null && video.averageRating > 0 && (

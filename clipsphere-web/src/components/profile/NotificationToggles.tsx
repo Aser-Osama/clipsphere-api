@@ -33,12 +33,12 @@ export default function NotificationToggles({ preferences, onChange }: Notificat
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm text-text">
         <thead>
-          <tr className="border-b border-gray-200">
-            <th className="py-3 pr-4 text-left font-medium text-gray-700">Category</th>
+          <tr className="border-b border-border-subtle">
+            <th className="py-3 pr-4 text-left font-medium text-text-muted">Category</th>
             {CHANNELS.map((ch) => (
-              <th key={ch.key} className="px-4 py-3 text-center font-medium text-gray-700">
+              <th key={ch.key} className="px-4 py-3 text-center font-medium text-text-muted">
                 {ch.label}
               </th>
             ))}
@@ -46,8 +46,8 @@ export default function NotificationToggles({ preferences, onChange }: Notificat
         </thead>
         <tbody>
           {CATEGORIES.map((cat) => (
-            <tr key={cat.key} className="border-b border-gray-100">
-              <td className="py-3 pr-4 text-gray-800">{cat.label}</td>
+            <tr key={cat.key} className="border-b border-border-subtle">
+              <td className="py-3 pr-4 text-text">{cat.label}</td>
               {CHANNELS.map((ch) => (
                 <td key={ch.key} className="px-4 py-3 text-center">
                   <button
@@ -56,8 +56,8 @@ export default function NotificationToggles({ preferences, onChange }: Notificat
                     aria-checked={preferences[ch.key][cat.key]}
                     aria-label={`${cat.label} ${ch.label}`}
                     onClick={() => toggle(ch.key, cat.key)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-300 ${
-                      preferences[ch.key][cat.key] ? "bg-brand-600" : "bg-gray-300"
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/30 ${
+                      preferences[ch.key][cat.key] ? "bg-brand-500" : "bg-surface-3"
                     }`}
                   >
                     <span

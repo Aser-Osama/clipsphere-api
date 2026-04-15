@@ -13,8 +13,10 @@ export default function FeedGrid({ videos, sentinelRef, isLoadingMore }: FeedGri
   return (
     <>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {videos.map((video) => (
-          <VideoCard key={video._id} video={video} />
+        {videos.map((video, i) => (
+          <div key={video._id} className={i < 8 ? `stagger-${i + 1}` : undefined}>
+            <VideoCard video={video} />
+          </div>
         ))}
       </div>
       {sentinelRef && (

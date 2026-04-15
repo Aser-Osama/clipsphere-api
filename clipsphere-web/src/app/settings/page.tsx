@@ -132,25 +132,25 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <h1 className="mb-8 text-2xl font-bold text-gray-900">Settings</h1>
+      <h1 className="mb-8 text-2xl font-bold text-text-strong font-display">Settings</h1>
 
       {/* Profile Section */}
-      <section className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Edit Profile</h2>
+      <section className="rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-lg font-semibold text-text-strong">Edit Profile</h2>
 
         <form onSubmit={handleProfileSubmit} className="space-y-5">
           {/* Avatar */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Avatar</label>
+            <label className="mb-1 block text-sm font-medium text-text-muted">Avatar</label>
             <div className="flex items-center gap-4">
               {avatarPreview || avatarUrl ? (
                 <img
                   src={avatarPreview ?? avatarUrl!}
                   alt="Avatar preview"
-                  className="h-16 w-16 rounded-full object-cover border-2 border-brand-200"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-border"
                 />
               ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-200 text-xl font-bold text-brand-800">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/20 text-xl font-bold text-brand-400">
                   {user?.username?.slice(0, 2).toUpperCase() ?? "?"}
                 </div>
               )}
@@ -160,14 +160,14 @@ export default function SettingsPage() {
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   onChange={handleAvatarSelect}
-                  className="text-sm text-gray-600"
+                  className="block text-sm text-text-muted file:mr-4 file:rounded-lg file:border file:border-border file:bg-surface-2 file:px-4 file:py-2 file:text-sm file:font-medium file:text-text-strong hover:file:border-brand-500/40 hover:file:bg-surface-3"
                 />
                 {avatarFile && (
                   <button
                     type="button"
                     onClick={handleAvatarUpload}
                     disabled={avatarSaving}
-                    className="mt-2 rounded-lg bg-brand-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="mt-2 rounded-lg bg-brand-500 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-400 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {avatarSaving ? "Uploading…" : "Upload Avatar"}
                   </button>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
           </div>
 
           <div>
-            <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="username" className="mb-1 block text-sm font-medium text-text-muted">
               Username
             </label>
             <input
@@ -185,12 +185,12 @@ export default function SettingsPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-strong focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
             />
           </div>
 
           <div>
-            <label htmlFor="bio" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="bio" className="mb-1 block text-sm font-medium text-text-muted">
               Bio
             </label>
             <textarea
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-strong placeholder-text-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
               placeholder="Tell people about yourself…"
             />
           </div>
@@ -206,7 +206,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={profileSaving}
-            className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 focus:ring-2 focus:ring-brand-300 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400 focus:ring-2 focus:ring-brand-500/20 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {profileSaving ? "Saving…" : "Save Profile"}
           </button>
@@ -214,8 +214,8 @@ export default function SettingsPage() {
       </section>
 
       {/* Notification Preferences */}
-      <section className="mt-6 rounded-2xl border border-brand-100 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Notification Preferences</h2>
+      <section className="mt-6 rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-lg font-semibold text-text-strong">Notification Preferences</h2>
 
         {prefs && <NotificationToggles preferences={prefs} onChange={setPrefs} />}
 
@@ -224,7 +224,7 @@ export default function SettingsPage() {
             type="button"
             onClick={handlePrefsSave}
             disabled={prefsSaving}
-            className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 focus:ring-2 focus:ring-brand-300 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+            className="rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400 focus:ring-2 focus:ring-brand-500/20 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {prefsSaving ? "Saving…" : "Save Preferences"}
           </button>

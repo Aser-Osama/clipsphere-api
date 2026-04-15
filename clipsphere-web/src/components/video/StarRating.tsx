@@ -47,7 +47,7 @@ export default function StarRating({
           <svg
             className={clsx(
               sizeClasses[size],
-              star <= display ? "text-yellow-400" : "text-gray-300"
+              star <= display ? "text-gold" : "text-text-faint"
             )}
             fill="currentColor"
             viewBox="0 0 20 20"

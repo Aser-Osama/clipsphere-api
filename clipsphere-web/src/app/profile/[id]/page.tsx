@@ -82,11 +82,11 @@ export default function ProfilePage({ params }: PageProps) {
   if (notFound || !user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">User not found</h1>
-        <p className="mt-2 text-gray-600">The profile you&apos;re looking for doesn&apos;t exist.</p>
+        <h1 className="text-2xl font-bold text-text-strong">User not found</h1>
+        <p className="mt-2 text-text-muted">The profile you&apos;re looking for doesn&apos;t exist.</p>
         <Link
           href="/"
-          className="mt-4 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
+          className="mt-4 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400"
         >
           Go Home
         </Link>
@@ -107,7 +107,7 @@ export default function ProfilePage({ params }: PageProps) {
       />
 
       <div className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Videos</h2>
+        <h2 className="mb-4 text-lg font-semibold text-text-strong font-display">Videos</h2>
         <UserVideoGrid userId={id} />
       </div>
     </div>

@@ -71,13 +71,13 @@ export default function LikeButton({
       className={clsx(
         "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all",
         liked
-          ? "bg-red-50 text-red-600 hover:bg-red-100"
-          : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-        (!isAuthenticated || loading) && "cursor-not-allowed opacity-50"
+          ? "bg-brand-500/15 text-brand-500"
+          : "bg-surface-2 text-text-muted hover:bg-surface-3 hover:text-text",
+        (!isAuthenticated || loading) && "opacity-50 cursor-not-allowed"
       )}
     >
       <svg
-        className={clsx("h-5 w-5", liked && "fill-red-500 text-red-500")}
+        className={clsx("h-5 w-5", liked && "fill-brand-500 text-brand-500")}
         fill={liked ? "currentColor" : "none"}
         viewBox="0 0 24 24"
         stroke="currentColor"

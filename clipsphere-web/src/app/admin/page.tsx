@@ -113,8 +113,8 @@ export default function AdminPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <h1 className="text-3xl font-bold text-brand-900">Admin Dashboard</h1>
-      <p className="mt-1 text-sm text-brand-500">
+      <h1 className="text-3xl font-bold text-text-strong font-display">Admin Dashboard</h1>
+      <p className="mt-1 text-sm text-text-muted">
         System overview and content moderation
       </p>
 

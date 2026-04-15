@@ -64,15 +64,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-160px)] items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-2xl border border-brand-100 bg-white p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-2xl font-bold text-brand-900">
+    <div className="flex min-h-[calc(100vh-160px)] items-center justify-center px-4 bg-gradient-to-br from-brand-500/5 via-transparent to-violet-500/5">
+      <div className="glass glow-accent w-full max-w-md rounded-2xl p-8 animate-fade-in-up">
+        <h1 className="mb-6 text-center font-display text-2xl font-bold text-text-strong">
           Sign in to ClipSphere
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-text-muted">
               Email
             </label>
             <input
@@ -80,14 +80,14 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-strong placeholder-text-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
               placeholder="you@example.com"
               autoComplete="email"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="mb-1 block text-sm font-medium text-text-muted">
               Password
             </label>
             <input
@@ -95,28 +95,28 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-strong placeholder-text-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
               placeholder="••••••••"
               autoComplete="current-password"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-error">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 focus:ring-2 focus:ring-brand-300 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400 focus:ring-2 focus:ring-brand-500/30 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-text-muted">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-brand-600 hover:text-brand-500">
+          <Link href="/register" className="font-medium text-brand-400 hover:text-brand-300">
             Create one
           </Link>
         </p>
