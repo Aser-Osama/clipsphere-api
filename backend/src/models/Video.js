@@ -23,6 +23,9 @@ const videoSchema = new mongoose.Schema(
     key: {
       type: String
     },
+    thumbnailKey: {
+      type: String
+    },
     duration: {
       type: Number,
       required: true,

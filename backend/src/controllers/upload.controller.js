@@ -59,6 +59,7 @@ const { uploadObject, deleteObject } = require('../services/storage.service');
 const { VIDEOS_BUCKET } = require('../config/s3');
 const { AppError, asyncWrapper } = require('../middleware/errorHandler');
 const { uploadVideoSchema } = require('../validators/upload.validators');
+const { generateThumbnail } = require('../utils/thumbnailGenerator');
 
 const uploadVideoHandler = asyncWrapper(async (req, res) => {
   const parsed = uploadVideoSchema.safeParse(req.body);
@@ -78,6 +79,16 @@ const uploadVideoHandler = asyncWrapper(async (req, res) => {
     throw new AppError('Failed to upload video to storage', 500);
   }
 
+  let thumbnailKey;
+  try {
+    const thumbBuffer = await generateThumbnail(req.file.buffer);
+    thumbnailKey = key.replace(/\.[^.]+$/, '-thumb.jpg');
+    await uploadObject(VIDEOS_BUCKET, thumbnailKey, thumbBuffer, 'image/jpeg');
+  } catch (err) {
+    console.warn('Thumbnail generation failed, continuing without:', err.message);
+    thumbnailKey = undefined;
+  }
+
   let video;
   try {
     video = await Video.create({
@@ -86,6 +97,7 @@ const uploadVideoHandler = asyncWrapper(async (req, res) => {
       status: status || 'public',
       owner: req.user._id,
       key,
+      thumbnailKey,
       videoURL: key,
       duration: req.videoDuration,
     });
