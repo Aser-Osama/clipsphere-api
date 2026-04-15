@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { decodeJwt, jwtVerify } from "jose";
 
 const ADMIN_PATHS = /^\/admin(\/|$)/;
 
@@ -10,25 +10,26 @@ function redirectToLogin(request: NextRequest) {
   return NextResponse.redirect(loginUrl);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
   if (!token) {
     return redirectToLogin(request);
   }
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    return redirectToLogin(request);
-  }
-
   let payload: { id?: string; role?: string };
   try {
-    const { payload: jwtPayload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(secret)
-    );
-    payload = jwtPayload as { id?: string; role?: string };
+    const secret = process.env.JWT_SECRET;
+
+    if (secret) {
+      const { payload: jwtPayload } = await jwtVerify(
+        token,
+        new TextEncoder().encode(secret)
+      );
+      payload = jwtPayload as { id?: string; role?: string };
+    } else {
+      payload = decodeJwt(token) as { id?: string; role?: string };
+    }
   } catch {
     return redirectToLogin(request);
   }

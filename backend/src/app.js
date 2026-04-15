@@ -29,6 +29,7 @@ const defaultCorsOrigins = [
 ];
 
 const githubIoOriginPattern = /^https:\/\/[a-z0-9-]+\.github\.io$/i;
+const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim()).filter(Boolean)
@@ -43,7 +44,7 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    if (isDev && githubIoOriginPattern.test(origin)) {
+    if (isDev && (githubIoOriginPattern.test(origin) || localDevOriginPattern.test(origin))) {
       return callback(null, true);
     }
 

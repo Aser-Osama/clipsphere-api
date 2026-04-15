@@ -18,9 +18,18 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const getRedirectTarget = () => {
+    if (typeof window === "undefined") {
+      return "/";
+    }
+
+    const from = new URLSearchParams(window.location.search).get("from");
+    return from?.startsWith("/") ? from : "/";
+  };
+
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push("/");
+      router.push(getRedirectTarget());
     }
   }, [authLoading, isAuthenticated, router]);
 
@@ -47,7 +56,7 @@ export default function RegisterPage() {
     try {
       await api.post("/auth/register", { username, email, password });
       await login(email, password);
-      router.push("/");
+      router.push(getRedirectTarget());
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string }>;
       setError(axiosErr.response?.data?.message || "Registration failed. Please try again.");

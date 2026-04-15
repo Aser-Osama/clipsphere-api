@@ -15,9 +15,18 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const getRedirectTarget = () => {
+    if (typeof window === "undefined") {
+      return "/";
+    }
+
+    const from = new URLSearchParams(window.location.search).get("from");
+    return from?.startsWith("/") ? from : "/";
+  };
+
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push("/");
+      router.push(getRedirectTarget());
     }
   }, [authLoading, isAuthenticated, router]);
 
@@ -41,7 +50,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await login(email, password);
-      router.push("/");
+      router.push(getRedirectTarget());
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string }>;
       setError(axiosErr.response?.data?.message || "Invalid credentials");
