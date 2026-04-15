@@ -2,17 +2,21 @@
 
 ClipSphere is a full-stack short-video social platform with a Next.js frontend and an Express/MongoDB backend. Users can upload, discover, review, and share short videos. Admins have a dedicated dashboard for platform oversight.
 
+> **Detailed docs**
+> - [Backend README](./backend/README.md) — API reference, architecture, env vars, scripts
+> - [Frontend README](./clipsphere-web/README.md) — pages, design system, auth flow, scripts
+
 ## Architecture
 
 ```
-Frontend (Next.js 16)  →  API proxy  →  Backend (Express)  →  MongoDB
+Frontend (Next.js 15)  →  API proxy  →  Backend (Express)  →  MongoDB
      :3000                                   :5000              :27017
                                                ↕
                                          MinIO (S3-compat)
                                           :9000 / :9001
 ```
 
-- **Frontend**: Next.js App Router, Tailwind v4, cookie-based JWT auth
+- **Frontend**: Next.js App Router, Tailwind v4, "Electric Cinema" dark-first design, cookie-based JWT auth
 - **Backend**: Express, Mongoose, Zod validation, three-layer architecture (Routes → Controllers → Services)
 - **Storage**: MinIO via Docker for video and avatar files, presigned URLs for secure access
 - **Email**: Nodemailer with Ethereal fallback for development
@@ -21,18 +25,8 @@ Frontend (Next.js 16)  →  API proxy  →  Backend (Express)  →  MongoDB
 
 - **Node.js 18+**
 - **Docker Desktop** (for MongoDB and MinIO containers)
-- **ffmpeg** installed on your system (for video duration validation)
 
-```bash
-# Ubuntu/Debian
-sudo apt install ffmpeg
-
-# macOS
-brew install ffmpeg
-
-# Verify
-ffmpeg -version
-```
+> ffmpeg is **not** required as a system install — it is bundled automatically via `@ffmpeg-installer/ffmpeg`.
 
 ## Quick Start (Full Stack)
 
@@ -58,32 +52,7 @@ cd ..
 cp backend/.env.example backend/.env
 ```
 
-Edit `backend/.env` and set a real JWT secret:
-
-```env
-PORT=5000
-MONGODB_URI=mongodb://127.0.0.1:27017/clipsphere
-JWT_SECRET=pick_a_strong_secret_here
-CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:5000
-
-# MinIO (defaults work with Docker Compose)
-MINIO_ENDPOINT=localhost
-MINIO_PORT=9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_VIDEOS=clipsphere-videos
-MINIO_BUCKET_AVATARS=clipsphere-avatars
-MINIO_USE_SSL=false
-
-CLIENT_URL=http://localhost:3000
-
-# SMTP (leave blank to auto-use Ethereal test accounts)
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-EMAIL_FROM=ClipSphere <noreply@clipsphere.local>
-```
+Edit `backend/.env` — set a real `JWT_SECRET` at minimum. All other defaults work out of the box with the Docker Compose services.
 
 ### 3. Start infrastructure (MongoDB + MinIO)
 
@@ -92,13 +61,12 @@ cd backend
 npm run deps:up
 ```
 
-This starts both containers. Verify they're running:
+Verify containers are running:
 
 ```bash
 docker ps
+# should show clipsphere-mongo (:27017) and clipsphere-minio (:9000, :9001)
 ```
-
-You should see `clipsphere-mongo` (port 27017) and `clipsphere-minio` (ports 9000, 9001).
 
 ### 4. Start the backend
 
@@ -107,7 +75,7 @@ cd backend
 npm run dev
 ```
 
-The API starts on **http://localhost:5000**. On startup it automatically creates the MinIO buckets (`clipsphere-videos` and `clipsphere-avatars`).
+API starts on **http://localhost:5000**. MinIO buckets are created automatically on first start.
 
 ### 5. Start the frontend
 
@@ -118,31 +86,29 @@ cd clipsphere-web
 npm run dev
 ```
 
-The frontend starts on **http://localhost:3000**. It proxies all `/api/v1/*` requests to the backend automatically via Next.js rewrites.
+Frontend starts on **http://localhost:3000**. All `/api/v1/*` requests are proxied to the backend via Next.js rewrites — no extra configuration needed.
 
-## Verification & Testing
-
-### Access Points
+## Access Points
 
 | Service | URL | Notes |
-|---------|-----|-------|
+|---|---|---|
 | **Frontend** | http://localhost:3000 | Next.js app |
 | **Backend API** | http://localhost:5000 | Express API |
 | **Swagger Docs** | http://localhost:5000/api-docs | Interactive API docs |
 | **MinIO Console** | http://localhost:9001 | Login: `minioadmin` / `minioadmin` |
 
-### Test with Postman / Newman
+## Testing
 
-The project includes a Postman collection for Phase 1 API verification.
+### Postman / Newman
 
-**Run all tests** (requires backend running + MongoDB seeded):
+The project includes a Postman collection for API verification.
+
+> ⚠️ `npm test` is **destructive** — it drops the test database before re-seeding.
 
 ```bash
 cd backend
 npm test
 ```
-
-> ⚠️ `npm test` is destructive — it drops the test database and re-seeds the admin user before running.
 
 **Run a specific folder** (non-destructive):
 
@@ -281,10 +247,10 @@ npm run deps:down
 ## Troubleshooting
 
 | Problem | Solution |
-|---------|----------|
+|---|---|
 | `ECONNREFUSED :27017` | Run `cd backend && npm run deps:up` to start MongoDB |
 | `ECONNREFUSED :9000` | Run `cd backend && npm run deps:up` to start MinIO |
-| Videos fail to upload | Verify `ffmpeg` is installed: `ffmpeg -version` |
+| Videos fail to upload | Check backend logs — ffmpeg is bundled, no system install needed |
 | Frontend can't reach API | Ensure backend is running on port 5000 |
 | MinIO buckets missing | Restart backend — buckets are auto-created on startup |
 | Emails not sending | Check backend console for Ethereal preview URLs (dev mode) |
