@@ -42,11 +42,7 @@ const { asyncWrapper, AppError } = require('../middleware/errorHandler');
 exports.getVideoById = asyncWrapper(async (req, res) => {
   const { id } = req.params;
 
-  const video = await Video.findByIdAndUpdate(
-    id,
-    { $inc: { viewsCount: 1 } },
-    { new: true }
-  ).populate('owner', 'username avatarKey');
+  const video = await Video.findById(id).populate('owner', 'username avatarKey');
 
   if (!video) {
     throw new AppError('Video not found', 404);
@@ -60,11 +56,19 @@ exports.getVideoById = asyncWrapper(async (req, res) => {
     }
   }
 
-  const likeCount = await Like.countDocuments({ video: id });
+  await Video.findByIdAndUpdate(id, { $inc: { viewsCount: 1 } });
+  video.viewsCount += 1;
+
+  const [likeCount, likeDoc] = await Promise.all([
+    Like.countDocuments({ video: id }),
+    req.user ? Like.exists({ video: id, user: req.user.id }) : Promise.resolve(null),
+  ]);
+
+  const hasLiked = Boolean(likeDoc);
 
   res.json({
     status: 'success',
-    data: { video, likeCount }
+    data: { video, likeCount, hasLiked }
   });
 });
 

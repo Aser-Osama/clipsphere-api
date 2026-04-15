@@ -9,7 +9,7 @@ interface HealthWidgetProps {
       heapTotal: number;
     };
     dbStatus: string;
-    environment: string;
+    environment?: string;
   };
 }
 
@@ -89,12 +89,12 @@ export default function HealthWidget({ health }: HealthWidgetProps) {
           <dd className="mt-1">
             <span
               className={`inline-block rounded-full px-3 py-0.5 text-xs font-semibold ${
-                health.environment === "production"
+                (health.environment ?? 'development') === "production"
                   ? "bg-brand-100 text-brand-800"
                   : "bg-amber-100 text-amber-800"
               }`}
             >
-              {health.environment}
+              {health.environment ?? 'unknown'}
             </span>
           </dd>
         </div>

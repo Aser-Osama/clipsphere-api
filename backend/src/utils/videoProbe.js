@@ -1,4 +1,6 @@
 const ffmpeg = require('fluent-ffmpeg');
+const ffprobePath = require('@ffprobe-installer/ffprobe').path;
+ffmpeg.setFfprobePath(ffprobePath);
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
