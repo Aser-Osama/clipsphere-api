@@ -24,6 +24,7 @@ exports.updateVideo = async (videoId, updates) => {
 
   Object.assign(video, updates);
   await video.save();
+  await video.populate('owner', 'username avatarKey');
   return video;
 };
 
@@ -48,6 +49,7 @@ exports.addReview = async (userId, videoId, data) => {
   if (!video) throw new AppError('Video not found', 404);
 
   const review = await Review.create({ ...data, user: userId, video: videoId });
+  await review.populate('user', 'username avatarKey');
   const videoOwner = await User.findById(video.owner);
 
   await notificationService.handlePreferenceAwareNotification({
