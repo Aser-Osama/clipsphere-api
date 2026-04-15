@@ -37,13 +37,39 @@ const checkNotSelf = (req, res, next) => {
  *         description: Target user ID to follow
  *     responses:
  *       201:
- *         description: Followed
+ *         description: Followed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Followed
  *       400:
  *         description: Invalid ID format or self-follow attempt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/:id/follow', protect, validate(objectIdParamSchema, 'params'), checkNotSelf, followerController.followUser);
 
@@ -63,13 +89,39 @@ router.post('/:id/follow', protect, validate(objectIdParamSchema, 'params'), che
  *         description: Target user ID to unfollow
  *     responses:
  *       200:
- *         description: Unfollowed
+ *         description: Unfollowed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Unfollowed
  *       400:
  *         description: Invalid ID format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found or not following
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete('/:id/unfollow', protect, validate(objectIdParamSchema, 'params'), followerController.unfollowUser);
 
@@ -88,11 +140,41 @@ router.delete('/:id/unfollow', protect, validate(objectIdParamSchema, 'params'),
  *         description: User ID whose followers should be listed
  *     responses:
  *       200:
- *         description: Followers list
+ *         description: List of followers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       followerId:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           username:
+ *                             type: string
+ *                           avatarKey:
+ *                             type: string
  *       400:
  *         description: Invalid ID format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/:id/followers', validate(objectIdParamSchema, 'params'), followerController.getFollowers);
 
@@ -111,11 +193,41 @@ router.get('/:id/followers', validate(objectIdParamSchema, 'params'), followerCo
  *         description: User ID whose following list should be listed
  *     responses:
  *       200:
- *         description: Following list
+ *         description: List of followed accounts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       followingId:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           username:
+ *                             type: string
+ *                           avatarKey:
+ *                             type: string
  *       400:
  *         description: Invalid ID format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/:id/following', validate(objectIdParamSchema, 'params'), followerController.getFollowing);
 
@@ -158,12 +270,60 @@ router.get('/:id/following', validate(objectIdParamSchema, 'params'), followerCo
  *     responses:
  *       200:
  *         description: Updated preferences
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     notificationPreferences:
+ *                       type: object
+ *                       properties:
+ *                         inApp:
+ *                           type: object
+ *                           properties:
+ *                             followers:
+ *                               type: boolean
+ *                             comments:
+ *                               type: boolean
+ *                             likes:
+ *                               type: boolean
+ *                             tips:
+ *                               type: boolean
+ *                         email:
+ *                           type: object
+ *                           properties:
+ *                             followers:
+ *                               type: boolean
+ *                             comments:
+ *                               type: boolean
+ *                             likes:
+ *                               type: boolean
+ *                             tips:
+ *                               type: boolean
  *       400:
  *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.patch('/preferences', protect, validate(preferencesSchema), userController.updatePreferences);
 
@@ -177,11 +337,51 @@ router.patch('/preferences', protect, validate(preferencesSchema), userControlle
  *     security: [{ BearerAuth: [] }]
  *     responses:
  *       200:
- *         description: User profile
+ *         description: Current user's profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                       enum: [user, admin]
+ *                     bio:
+ *                       type: string
+ *                     avatarKey:
+ *                       type: string
+ *                     accountStatus:
+ *                       type: string
+ *                       enum: [active, suspended, banned]
+ *                     notificationPreferences:
+ *                       type: object
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/me', protect, userController.getMe);
 
@@ -215,12 +415,43 @@ router.get('/me', protect, userController.getMe);
  *     responses:
  *       200:
  *         description: Updated profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     bio:
+ *                       type: string
+ *                     avatarKey:
+ *                       type: string
  *       400:
  *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.patch('/updateMe', protect, validate(updateMeSchema), userController.updateMe);
 
@@ -239,11 +470,41 @@ router.patch('/updateMe', protect, validate(updateMeSchema), userController.upda
  *         description: User ID for public profile lookup
  *     responses:
  *       200:
- *         description: Public profile
+ *         description: Public user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     bio:
+ *                       type: string
+ *                     avatarKey:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
  *       400:
  *         description: Invalid ID format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/:id', validate(objectIdParamSchema, 'params'), userController.getUserById);
 
