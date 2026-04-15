@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decodeJwt, jwtVerify } from "jose";
+import { jwtVerify } from "jose";
 
 const ADMIN_PATHS = /^\/admin(\/|$)/;
 
@@ -21,15 +21,16 @@ export async function proxy(request: NextRequest) {
   try {
     const secret = process.env.JWT_SECRET;
 
-    if (secret) {
-      const { payload: jwtPayload } = await jwtVerify(
-        token,
-        new TextEncoder().encode(secret)
-      );
-      payload = jwtPayload as { id?: string; role?: string };
-    } else {
-      payload = decodeJwt(token) as { id?: string; role?: string };
+    if (!secret) {
+      // Without JWT_SECRET we cannot verify token integrity — reject the request
+      return redirectToLogin(request);
     }
+
+    const { payload: jwtPayload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(secret)
+    );
+    payload = jwtPayload as { id?: string; role?: string };
   } catch {
     return redirectToLogin(request);
   }

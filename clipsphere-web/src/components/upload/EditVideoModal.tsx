@@ -52,7 +52,7 @@ export default function EditVideoModal({
   }) {
     setIsSubmitting(true);
     try {
-      const res = await api.patch(`/videos/${video._id}`, {
+      await api.patch(`/videos/${video._id}`, {
         title: data.title,
         description: data.description,
       });

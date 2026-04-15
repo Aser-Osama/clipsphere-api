@@ -104,6 +104,9 @@ const uploadVideoHandler = asyncWrapper(async (req, res) => {
   } catch (dbErr) {
     try {
       await deleteObject(VIDEOS_BUCKET, key);
+      if (thumbnailKey) {
+        await deleteObject(VIDEOS_BUCKET, thumbnailKey);
+      }
     } catch (cleanupErr) {
       console.error('S3 cleanup failed after DB error:', cleanupErr);
     }

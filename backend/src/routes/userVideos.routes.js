@@ -3,8 +3,8 @@ const router = express.Router();
 const { getUserVideos } = require('../controllers/userVideos.controller');
 const optionalAuth = require('../middleware/optionalAuth');
 const validate = require('../middleware/validate');
-const { videoIdParamSchema } = require('../validators/feed.validators');
+const { objectIdParamSchema } = require('../validators/user.validators');
 
-router.get('/:id/videos', validate(videoIdParamSchema, 'params'), optionalAuth, getUserVideos);
+router.get('/:id/videos', validate(objectIdParamSchema, 'params'), optionalAuth, getUserVideos);
 
 module.exports = router;

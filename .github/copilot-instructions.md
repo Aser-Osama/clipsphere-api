@@ -2,7 +2,7 @@
 
 ## Local-only handling
 
-- Keep this file outside the git repo. Do not copy it into `clipsphere-api/`, link to it, mention it from tracked files, or reference it from commits, PR text, issues, docs, comments, workflows, or release notes.
+- This file is stored in the git repo. Do not copy it into `clipsphere-api/`, duplicate it elsewhere in the repository, or reference it from commits, PR text, issues, docs, comments, workflows, or release notes unless repository policy is intentionally being updated.
 - Treat `agent_ready/SWAPD352_Web_Dev_Project (1)/document.md` as the primary project spec. Use `agent_ready/SWAPD352_Web_Dev_Project (1)/chunks.jsonl` for targeted lookup by section or topic.
 - Use the document-pack `README.md` and `manifest.json` only to understand pack structure and retrieval flow. The `*_content_list.json`, `*_model.json`, and `*_middle.json` files are extraction metadata, not the primary authoring source.
 

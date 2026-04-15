@@ -1,6 +1,6 @@
 # ClipSphere Web
 
-Next.js 15 App Router frontend for ClipSphere — a short-video sharing platform. Dark-first "Electric Cinema" design with real video thumbnails, JWT cookie auth, and a proxied connection to the Express backend.
+Next.js 16 App Router frontend for ClipSphere — a short-video sharing platform. Dark-first "Electric Cinema" design with real video thumbnails, JWT cookie auth, and a proxied connection to the Express backend.
 
 ---
 
