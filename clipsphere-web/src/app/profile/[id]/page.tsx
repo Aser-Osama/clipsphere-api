@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import api from "@/services/api";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@/types";
@@ -83,12 +84,12 @@ export default function ProfilePage({ params }: PageProps) {
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
         <h1 className="text-2xl font-bold text-gray-900">User not found</h1>
         <p className="mt-2 text-gray-600">The profile you&apos;re looking for doesn&apos;t exist.</p>
-        <a
+        <Link
           href="/"
           className="mt-4 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
           Go Home
-        </a>
+        </Link>
       </div>
     );
   }

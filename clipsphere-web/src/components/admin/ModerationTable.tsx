@@ -3,9 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 
+interface VideoItem {
+  _id?: string;
+  title?: string;
+  owner?: string | { username: string };
+  status?: string;
+  averageRating?: number;
+}
+
 interface ModerationTableProps {
-  flaggedVideos: any[];
-  lowRatedVideos: any[];
+  flaggedVideos: VideoItem[];
+  lowRatedVideos: VideoItem[];
 }
 
 type Tab = "flagged" | "lowRated";
@@ -64,7 +72,7 @@ export default function ModerationTable({ flaggedVideos, lowRatedVideos }: Moder
               </tr>
             </thead>
             <tbody>
-              {videos.map((video: any, i: number) => (
+              {videos.map((video: VideoItem, i: number) => (
                 <tr
                   key={video._id ?? i}
                   className="border-b border-brand-50 even:bg-brand-50/30 hover:bg-brand-50 transition-colors"

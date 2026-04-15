@@ -8,7 +8,8 @@ exports.getHealth = () => {
   return {
     uptime: process.uptime(),
     memoryUsage: process.memoryUsage(),
-    dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV || 'development'
   };
 };
 

@@ -43,7 +43,7 @@ exports.sendWelcomeEmail = async (user) => {
          Thanks for joining ClipSphere. Start exploring, uploading, and sharing amazing videos with the community.
        </p>
        <p style="margin:24px 0;text-align:center;">
-         <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}"
+         <a href="${process.env.CLIENT_URL || 'http://localhost:3000'}"
             style="background:#6c63ff;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:bold;">
            Get Started
          </a>
@@ -74,7 +74,7 @@ const engagementSubjects = {
 
 function buildEngagementBody(actorName, type, meta) {
   const videoLink = meta?.videoId
-    ? `<a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/video/${meta.videoId}" style="color:#6c63ff;">View video</a>`
+    ? `<a href="${process.env.CLIENT_URL || 'http://localhost:3000'}/video/${meta.videoId}" style="color:#6c63ff;">View video</a>`
     : '';
 
   const safe = escapeHtml(actorName);

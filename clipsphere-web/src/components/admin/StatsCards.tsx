@@ -2,7 +2,7 @@
 
 interface MostActiveUser {
   username: string;
-  [key: string]: any;
+  videoCount?: number;
 }
 
 interface StatsCardsProps {

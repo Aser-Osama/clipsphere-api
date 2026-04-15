@@ -25,8 +25,8 @@ export const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // undefined = initial load in progress, null = not authenticated, User = authenticated
+  const [user, setUser] = useState<User | null | undefined>(undefined);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -44,7 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    refreshUser().finally(() => setIsLoading(false));
+    // refreshUser is async; calling it here is the standard auth-init pattern.
+    // The rule flags it because refreshUser calls setUser, but this is not a synchronous cascade.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshUser();
   }, [refreshUser]);
 
   const login = useCallback(
@@ -64,14 +67,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      user,
-      isLoading,
+      user: user ?? null,
+      isLoading: user === undefined,
       isAuthenticated: !!user,
       login,
       logout,
       refreshUser,
     }),
-    [user, isLoading, login, logout, refreshUser]
+    [user, login, logout, refreshUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

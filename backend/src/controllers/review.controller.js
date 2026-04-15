@@ -124,7 +124,7 @@ exports.deleteReview = asyncWrapper(async (req, res) => {
     throw new AppError('Review not found', 404);
   }
 
-  if (review.user.toString() !== req.user.id) {
+  if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
     throw new AppError('You can only delete your own reviews', 403);
   }
 

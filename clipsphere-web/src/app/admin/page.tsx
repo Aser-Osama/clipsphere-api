@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/services/api";
+import type { AxiosError } from "axios";
 import Spinner from "@/components/ui/Spinner";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import Toast from "@/components/ui/Toast";
@@ -14,19 +15,27 @@ import ModerationTable from "@/components/admin/ModerationTable";
 interface StatsData {
   totalUsers: number;
   totalVideos: number;
-  mostActiveUsers: Array<{ username: string; [key: string]: any }>;
+  mostActiveUsers: Array<{ username: string; videoCount?: number }>;
 }
 
 interface HealthData {
   uptime: number;
   memoryUsage: { rss: number; heapUsed: number; heapTotal: number };
   dbStatus: string;
-  environment: string;
+  environment?: string;
+}
+
+interface VideoItem {
+  _id?: string;
+  title?: string;
+  owner?: string | { username: string };
+  status?: string;
+  averageRating?: number;
 }
 
 interface ModerationData {
-  flaggedVideos: any[];
-  lowRatedVideos: any[];
+  flaggedVideos: VideoItem[];
+  lowRatedVideos: VideoItem[];
 }
 
 export default function AdminPage() {
@@ -69,8 +78,9 @@ export default function AdminPage() {
       setStats(statsRes.data.data);
       setHealth(healthRes.data.data);
       setModeration(modRes.data.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message ?? "Failed to load admin data.");
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ message?: string }>;
+      setError(axiosErr.response?.data?.message ?? "Failed to load admin data.");
     } finally {
       setLoading(false);
     }

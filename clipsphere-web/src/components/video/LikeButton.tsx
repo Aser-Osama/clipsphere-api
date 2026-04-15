@@ -8,14 +8,16 @@ import { useAuth } from "@/hooks/useAuth";
 interface LikeButtonProps {
   videoId: string;
   initialLikeCount?: number;
+  initialLiked?: boolean;
 }
 
 export default function LikeButton({
   videoId,
   initialLikeCount = 0,
+  initialLiked = false,
 }: LikeButtonProps) {
   const { isAuthenticated } = useAuth();
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [loading, setLoading] = useState(false);
 
