@@ -7,7 +7,9 @@ const { deleteObject } = require('./storage.service');
 const { VIDEOS_BUCKET } = require('../config/s3');
 
 exports.createVideo = async (userId, data) => {
-  return Video.create({ ...data, owner: userId });
+  const video = await Video.create({ ...data, owner: userId });
+  await video.populate('owner', 'username avatarKey');
+  return video;
 };
 
 exports.getVideos = async (page = 1, limit = 20) => {

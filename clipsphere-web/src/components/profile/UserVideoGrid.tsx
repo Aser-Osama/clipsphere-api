@@ -3,9 +3,43 @@
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 import type { Video } from "@/types";
+import { getThumbnailUrl } from "@/utils/thumbnailUrl";
 
 interface UserVideoGridProps {
   userId: string;
+}
+
+function VideoThumb({ video }: { video: Video }) {
+  const [thumbUrl, setThumbUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (video.thumbnailKey) {
+      getThumbnailUrl(video._id).then((url) => {
+        if (!cancelled) setThumbUrl(url);
+      });
+    }
+    return () => { cancelled = true; };
+  }, [video._id, video.thumbnailKey]);
+
+  if (thumbUrl) {
+    return (
+      <img
+        src={thumbUrl}
+        alt={video.title}
+        className="aspect-video w-full object-cover"
+      />
+    );
+  }
+
+  // Gradient fallback (same seed logic as VideoCard)
+  const hue = parseInt(video._id.slice(-6), 16) % 360;
+  return (
+    <div
+      className="aspect-video w-full"
+      style={{ background: `linear-gradient(135deg, hsl(${hue},60%,25%) 0%, hsl(${(hue + 40) % 360},50%,15%) 100%)` }}
+    />
+  );
 }
 
 export default function UserVideoGrid({ userId }: UserVideoGridProps) {
@@ -62,7 +96,9 @@ export default function UserVideoGrid({ userId }: UserVideoGridProps) {
           href={`/video/${v._id}`}
           className="group overflow-hidden rounded-xl border border-border bg-surface transition-all hover:border-border-accent"
         >
-          <div className="aspect-video bg-surface-3" />
+          <div className="overflow-hidden">
+            <VideoThumb video={v} />
+          </div>
           <div className="p-3">
             <h3 className="truncate text-sm font-medium text-text-strong group-hover:text-brand-400">
               {v.title}
