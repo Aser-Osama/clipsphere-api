@@ -4,7 +4,7 @@ import { createContext, useCallback, useEffect, useMemo, useState } from "react"
 import type { ReactNode } from "react";
 import Cookies from "js-cookie";
 import api from "@/services/api";
-import type { User } from "@/types";
+import type { ApiResponse, User } from "@/types";
 
 interface AuthContextType {
   user: User | null;
@@ -52,8 +52,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const { data } = await api.post("/auth/login", { email, password });
-      Cookies.set("token", data.token, { expires: 7 });
+      const { data } = await api.post<ApiResponse<{ token: string; user: User }>>("/auth/login", {
+        email,
+        password,
+      });
+      const token = data.data?.token;
+
+      if (!token) {
+        throw new Error("Login response did not include a token.");
+      }
+
+      Cookies.set("token", token, { expires: 7 });
       await refreshUser();
     },
     [refreshUser]
