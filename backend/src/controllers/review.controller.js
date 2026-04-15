@@ -71,6 +71,7 @@ exports.updateReview = asyncWrapper(async (req, res) => {
   if (req.body.comment !== undefined) review.comment = req.body.comment;
 
   await review.save();
+  await review.populate('user', 'username avatarKey');
 
   res.json({
     status: 'success',
