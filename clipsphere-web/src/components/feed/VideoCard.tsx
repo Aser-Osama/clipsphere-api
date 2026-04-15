@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Video } from "@/types";
 import { getAvatarUrl } from "@/utils/avatarUrl";
+import { getThumbnailUrl } from "@/utils/thumbnailUrl";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -37,6 +38,7 @@ export default function VideoCard({ video }: VideoCardProps) {
   const hue = video._id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [thumbUrl, setThumbUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!video.owner?.avatarKey) return;
@@ -47,16 +49,32 @@ export default function VideoCard({ video }: VideoCardProps) {
     return () => { cancelled = true; };
   }, [video.owner._id, video.owner?.avatarKey]);
 
+  useEffect(() => {
+    if (!video.thumbnailKey) return;
+    let cancelled = false;
+    getThumbnailUrl(video._id).then((url) => {
+      if (!cancelled) setThumbUrl(url);
+    });
+    return () => { cancelled = true; };
+  }, [video._id, video.thumbnailKey]);
+
   return (
     <Link
       href={`/video/${video._id}`}
       className="group block overflow-hidden rounded-xl bg-surface border border-border transition-all hover:border-border-accent hover:glow-accent animate-fade-in-up"
     >
-      {/* Thumbnail placeholder */}
+      {/* Thumbnail */}
       <div
-        className="relative aspect-video"
-        style={{ background: `linear-gradient(135deg, hsl(${hue},50%,35%), hsl(${(hue + 40) % 360},40%,25%))` }}
+        className="relative aspect-video overflow-hidden"
+        style={!thumbUrl ? { background: `linear-gradient(135deg, hsl(${hue},50%,35%), hsl(${(hue + 40) % 360},40%,25%))` } : undefined}
       >
+        {thumbUrl && (
+          <img
+            src={thumbUrl}
+            alt={video.title}
+            className="h-full w-full object-cover"
+          />
+        )}
         <span className="absolute bottom-1.5 right-1.5 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-brand-400">
           {formatDuration(video.duration)}
         </span>

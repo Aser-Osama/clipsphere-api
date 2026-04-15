@@ -29,6 +29,7 @@ export interface Video {
   owner: Pick<User, "_id" | "username" | "avatarKey">;
   videoURL: string;
   key?: string;
+  thumbnailKey?: string;
   duration: number;
   viewsCount: number;
   status: "public" | "private" | "flagged";
