@@ -17,7 +17,7 @@ export default function CommentSection({ videoId }: CommentSectionProps) {
 
   return (
     <section className="space-y-6">
-      <h2 className="text-lg font-semibold text-gray-900">Reviews</h2>
+      <h2 className="text-lg font-semibold text-text-strong font-display">Reviews</h2>
 
       {isAuthenticated ? (
         <ReviewForm
@@ -28,9 +28,9 @@ export default function CommentSection({ videoId }: CommentSectionProps) {
           }}
         />
       ) : (
-        <div className="rounded-lg border border-dashed border-brand-200 bg-brand-50 p-4 text-center">
-          <p className="text-sm text-brand-700">
-            <a href="/login" className="font-medium underline hover:text-brand-900">
+        <div className="rounded-lg border border-dashed border-border-accent bg-brand-500/5 p-4 text-center">
+          <p className="text-sm text-text-muted">
+            <a href="/login" className="font-medium underline text-brand-400 hover:text-brand-300">
               Log in
             </a>{" "}
             to leave a review

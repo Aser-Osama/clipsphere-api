@@ -78,10 +78,10 @@ export default function FeedsPage() {
   };
 
   const tabClasses = (tab: Tab) =>
-    `px-4 py-2 text-sm font-medium rounded-t-lg transition ${
+    `px-5 py-2 text-sm rounded-full transition-colors ${
       activeTab === tab
-        ? "bg-brand-600 text-white"
-        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+        ? "bg-brand-500 text-white font-semibold"
+        : "bg-surface-2 text-text-muted font-medium hover:bg-surface-3 hover:text-text"
     }`;
 
   return (
@@ -101,12 +101,12 @@ export default function FeedsPage() {
       {/* Content */}
       {activeTab === "following" && !isAuthenticated ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-lg font-medium text-gray-700">
+          <p className="text-lg font-medium text-text-muted">
             Log in to see videos from creators you follow
           </p>
           <a
             href="/login"
-            className="mt-4 rounded-lg bg-brand-600 px-5 py-2 text-sm font-medium text-white hover:bg-brand-700"
+            className="mt-4 rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-400"
           >
             Log in
           </a>
@@ -123,7 +123,7 @@ export default function FeedsPage() {
         />
       ) : videos.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-lg font-medium text-gray-500">
+          <p className="text-lg font-medium text-text-muted">
             {activeTab === "trending"
               ? "No trending videos yet"
               : "Follow creators to see their videos here"}

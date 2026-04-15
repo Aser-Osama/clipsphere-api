@@ -139,28 +139,28 @@ export default function UploadPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-160px)] items-start justify-center px-4 py-10">
-      <div className="w-full max-w-2xl rounded-2xl border border-brand-100 bg-white p-8 shadow-lg">
-        <h1 className="mb-2 text-2xl font-bold text-brand-900">
+      <div className="w-full max-w-2xl rounded-2xl border border-border bg-surface p-8">
+        <h1 className="mb-2 text-2xl font-bold text-text-strong font-display">
           Upload Video
         </h1>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-6 text-sm text-text-muted">
           Share a new video with the ClipSphere community.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* ── File Drop Zone ── */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Video File <span className="text-red-500">*</span>
+            <label className="mb-1 block text-sm font-medium text-text-muted">
+              Video File <span className="text-error">*</span>
             </label>
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brand-200 bg-brand-50/40 px-6 py-10 transition hover:border-brand-400 hover:bg-brand-50"
+              className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border-accent bg-brand-500/5 px-6 py-10 transition-colors hover:border-brand-500 hover:bg-brand-500/10"
             >
               <svg
-                className="mb-3 h-10 w-10 text-brand-400"
+                className="mb-3 h-10 w-10 text-brand-500/50"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={1.5}
@@ -174,20 +174,20 @@ export default function UploadPage() {
               </svg>
               {file ? (
                 <div className="text-center">
-                  <p className="text-sm font-medium text-brand-700">
+                  <p className="text-sm font-medium text-brand-400">
                     {file.name}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-text-muted">
                     {formatBytes(file.size)}
                   </p>
                 </div>
               ) : (
                 <div className="text-center">
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-sm font-medium text-text-muted">
                     Drag &amp; drop your video here, or{" "}
-                    <span className="text-brand-600 underline">browse</span>
+                    <span className="text-brand-400 underline">browse</span>
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">
+                  <p className="mt-1 text-xs text-text-faint">
                     MP4, WebM, or QuickTime — max 5 minutes
                   </p>
                 </div>
@@ -201,7 +201,7 @@ export default function UploadPage() {
               />
             </div>
             {fileError && (
-              <p className="mt-1.5 text-sm text-red-600">{fileError}</p>
+              <p className="mt-1.5 text-sm text-error">{fileError}</p>
             )}
           </div>
 
@@ -209,9 +209,9 @@ export default function UploadPage() {
           <div>
             <label
               htmlFor="title"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium text-text-muted"
             >
-              Title <span className="text-red-500">*</span>
+              Title <span className="text-error">*</span>
             </label>
             <input
               id="title"
@@ -221,7 +221,7 @@ export default function UploadPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Give your video a title"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2 text-sm text-text-strong placeholder-text-faint transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             />
           </div>
 
@@ -229,7 +229,7 @@ export default function UploadPage() {
           <div>
             <label
               htmlFor="description"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium text-text-muted"
             >
               Description
             </label>
@@ -240,7 +240,7 @@ export default function UploadPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell viewers about your video (optional)"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2 text-sm text-text-strong placeholder-text-faint transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             />
           </div>
 
@@ -248,7 +248,7 @@ export default function UploadPage() {
           <div>
             <label
               htmlFor="status"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium text-text-muted"
             >
               Visibility
             </label>
@@ -256,7 +256,7 @@ export default function UploadPage() {
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+              className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2 text-sm text-text-strong transition focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
             >
               <option value="public">Public</option>
               <option value="private">Private</option>
@@ -266,11 +266,11 @@ export default function UploadPage() {
           {/* ── Progress Bar ── */}
           {isSubmitting && (
             <div>
-              <div className="mb-1 flex items-center justify-between text-xs text-gray-600">
+              <div className="mb-1 flex items-center justify-between text-xs text-text-muted">
                 <span>Uploading…</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-surface-3">
                 <div
                   className="h-full rounded-full bg-brand-500 transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
@@ -283,7 +283,7 @@ export default function UploadPage() {
           <button
             type="submit"
             disabled={isSubmitting || !file || !title.trim()}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? (
               <>

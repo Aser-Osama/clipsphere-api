@@ -65,7 +65,7 @@ export default function ReviewForm({ videoId, onReviewAdded }: ReviewFormProps) 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
+        <label className="mb-1 block text-sm font-medium text-text-muted">
           Your Rating
         </label>
         <StarRating value={rating} onChange={setRating} size="lg" />
@@ -74,7 +74,7 @@ export default function ReviewForm({ videoId, onReviewAdded }: ReviewFormProps) 
       <div>
         <label
           htmlFor="review-comment"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1 block text-sm font-medium text-text-muted"
         >
           Comment (optional)
         </label>
@@ -84,18 +84,18 @@ export default function ReviewForm({ videoId, onReviewAdded }: ReviewFormProps) 
           onChange={(e) => setComment(e.target.value)}
           rows={3}
           placeholder="Share your thoughts about this video..."
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
+          className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-strong placeholder-text-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
         />
       </div>
 
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
 
       <button
         type="submit"
         disabled={loading || rating === 0}
-        className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading && <Spinner size="sm" />}
         Submit Review

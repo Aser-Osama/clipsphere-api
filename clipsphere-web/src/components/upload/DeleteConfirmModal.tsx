@@ -71,16 +71,16 @@ export default function DeleteConfirmModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-bold text-red-700">Delete Video</h2>
-        <p className="mt-2 text-sm text-gray-600">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 shadow-2xl">
+        <h2 className="text-lg font-bold text-error font-display">Delete Video</h2>
+        <p className="mt-2 text-sm text-text-muted">
           This action is <strong>irreversible</strong>. The video{" "}
-          <span className="font-semibold text-gray-900">
+          <span className="font-semibold text-text-strong">
             &ldquo;{video.title}&rdquo;
           </span>{" "}
           and all associated data will be permanently removed.
@@ -89,7 +89,7 @@ export default function DeleteConfirmModal({
         <div className="mt-4">
           <label
             htmlFor="confirm-title"
-            className="mb-1 block text-sm font-medium text-gray-700"
+            className="mb-1 block text-sm font-medium text-text-muted"
           >
             Type the video title to confirm:
           </label>
@@ -98,7 +98,7 @@ export default function DeleteConfirmModal({
             type="text"
             value={confirmation}
             onChange={(e) => setConfirmation(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none"
+            className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-text-strong placeholder-text-faint focus:border-error focus:ring-2 focus:ring-error/20 focus:outline-none"
             placeholder={video.title}
             autoComplete="off"
           />
@@ -108,7 +108,7 @@ export default function DeleteConfirmModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="flex-1 rounded-lg bg-surface-2 px-4 py-2.5 text-sm font-medium text-text-muted transition hover:bg-surface-3"
           >
             Cancel
           </button>
@@ -116,7 +116,7 @@ export default function DeleteConfirmModal({
             type="button"
             onClick={handleDelete}
             disabled={!titleMatch || isDeleting}
-            className="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 focus:ring-2 focus:ring-red-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex-1 rounded-lg bg-error px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-error/90 focus:ring-2 focus:ring-error/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isDeleting ? (
               <span className="inline-flex items-center justify-center gap-2">

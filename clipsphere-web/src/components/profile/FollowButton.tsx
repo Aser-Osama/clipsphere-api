@@ -43,10 +43,10 @@ export default function FollowButton({ userId, isFollowing, onToggle }: FollowBu
       onClick={handleClick}
       disabled={loading}
       className={clsx(
-        "rounded-lg px-5 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-300 disabled:opacity-60 disabled:cursor-not-allowed",
+        "rounded-lg px-5 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:opacity-60 disabled:cursor-not-allowed",
         optimistic
-          ? "border border-brand-300 bg-white text-brand-700 hover:bg-brand-50"
-          : "bg-brand-600 text-white hover:bg-brand-700"
+          ? "border border-brand-500/30 bg-transparent text-brand-400 hover:bg-brand-500/10"
+          : "bg-brand-500 text-white hover:bg-brand-400"
       )}
     >
       {loading ? "…" : optimistic ? "Following" : "Follow"}

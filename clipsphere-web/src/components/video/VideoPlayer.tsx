@@ -89,7 +89,7 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
   const volumePercent = volume * 100;
 
   return (
-    <div className="w-full overflow-hidden rounded-xl bg-black">
+    <div className="w-full overflow-hidden rounded-xl border border-border bg-black">
       {isValidUrl ? (
         <div
           ref={containerRef}
@@ -133,9 +133,9 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
               step={0.1}
               value={currentTime}
               onChange={handleSeek}
-              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/30 accent-brand-500"
+              className="h-1 w-full cursor-pointer appearance-none rounded-full bg-text-faint accent-brand-500"
               style={{
-                background: `linear-gradient(to right, var(--color-brand-500, #6366f1) ${seekPercent}%, rgba(255,255,255,0.3) ${seekPercent}%)`,
+                background: `linear-gradient(to right, var(--color-brand-500, #FF6B5B) ${seekPercent}%, var(--color-text-faint, #4A4640) ${seekPercent}%)`,
               }}
             />
 
@@ -143,7 +143,7 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
               {/* Play / Pause */}
               <button
                 onClick={togglePlay}
-                className="text-white transition hover:text-brand-400"
+                className="text-text-strong transition hover:text-brand-400"
                 aria-label={playing ? "Pause" : "Play"}
               >
                 {playing ? (
@@ -158,7 +158,7 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
               </button>
 
               {/* Time display */}
-              <span className="min-w-[5rem] text-xs text-white/80">
+              <span className="min-w-[5rem] text-xs text-text-muted">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
 
@@ -167,7 +167,7 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
               {/* Volume */}
               <div className="flex items-center gap-1">
                 <svg
-                  className="h-4 w-4 text-white/80"
+                  className="h-4 w-4 text-text-muted"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -186,9 +186,9 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
                   step={0.05}
                   value={volume}
                   onChange={handleVolume}
-                  className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/30 accent-brand-500"
+                  className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-text-faint accent-brand-500"
                   style={{
-                    background: `linear-gradient(to right, var(--color-brand-500, #6366f1) ${volumePercent}%, rgba(255,255,255,0.3) ${volumePercent}%)`,
+                    background: `linear-gradient(to right, var(--color-brand-500, #FF6B5B) ${volumePercent}%, var(--color-text-faint, #4A4640) ${volumePercent}%)`,
                   }}
                 />
               </div>
@@ -196,7 +196,7 @@ export default function VideoPlayer({ url, title }: VideoPlayerProps) {
               {/* Fullscreen */}
               <button
                 onClick={toggleFullscreen}
-                className="text-white transition hover:text-brand-400"
+                className="text-text-strong transition hover:text-brand-400"
                 aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? (

@@ -100,17 +100,17 @@ export default function ReviewCard({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <div className="rounded-lg border border-border bg-surface-2 p-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/20 text-sm font-semibold text-brand-400">
             {review.user.username?.charAt(0).toUpperCase() ?? "?"}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-text-strong">
               {review.user.username}
             </p>
-            <p className="text-xs text-gray-500">{date}</p>
+            <p className="text-xs text-text-faint">{date}</p>
           </div>
         </div>
         {!editing && <StarRating value={displayRating} readonly size="sm" />}
@@ -119,7 +119,7 @@ export default function ReviewCard({
       {editing ? (
         <div className="mt-3 space-y-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-700">
+            <label className="mb-1 block text-xs font-medium text-text-muted">
               Rating
             </label>
             <StarRating value={editRating} onChange={setEditRating} size="sm" />
@@ -128,7 +128,7 @@ export default function ReviewCard({
             value={editComment}
             onChange={(e) => setEditComment(e.target.value)}
             rows={3}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            className="w-full rounded-md border border-border bg-surface-3 px-3 py-2 text-sm text-text-strong placeholder-text-faint focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             placeholder="Your review…"
           />
           <div className="flex gap-2">
@@ -136,7 +136,7 @@ export default function ReviewCard({
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+              className="rounded-md bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-400 disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save"}
             </button>
@@ -144,7 +144,7 @@ export default function ReviewCard({
               type="button"
               onClick={handleCancelEdit}
               disabled={saving}
-              className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+              className="rounded-md bg-surface-3 px-3 py-1.5 text-xs font-medium text-text-muted hover:bg-surface-2 disabled:opacity-50"
             >
               Cancel
             </button>
@@ -152,26 +152,26 @@ export default function ReviewCard({
         </div>
       ) : (
         displayComment && (
-          <p className="mt-3 text-sm leading-relaxed text-gray-700">
+          <p className="mt-3 text-sm leading-relaxed text-text">
             {displayComment}
           </p>
         )
       )}
 
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-error">{error}</p>}
 
       {isOwner && !editing && (
         <div className="mt-3 flex gap-2">
           {confirmDelete ? (
             <>
-              <span className="text-xs text-gray-700">
+              <span className="text-xs text-text-muted">
                 Delete this review?
               </span>
               <button
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+                className="text-xs font-medium text-error hover:text-error/80 disabled:opacity-50"
               >
                 {deleting ? "Deleting…" : "Confirm"}
               </button>
@@ -182,7 +182,7 @@ export default function ReviewCard({
                   setError("");
                 }}
                 disabled={deleting}
-                className="text-xs text-gray-500 hover:text-gray-700"
+                className="text-xs text-text-muted hover:text-text"
               >
                 Cancel
               </button>
@@ -197,14 +197,14 @@ export default function ReviewCard({
                   setEditComment(displayComment ?? "");
                   setError("");
                 }}
-                className="text-xs text-brand-600 hover:text-brand-700"
+                className="text-xs text-brand-400 hover:text-brand-300"
               >
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmDelete(true)}
-                className="text-xs text-red-600 hover:text-red-700"
+                className="text-xs text-error hover:text-error/80"
               >
                 Delete
               </button>

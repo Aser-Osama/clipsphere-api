@@ -91,8 +91,8 @@ export default function ReviewList({ videoId, refreshKey, optimisticReview, onRe
 
   if (unavailable) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-        <p className="text-sm text-gray-500">
+      <div className="rounded-lg border border-dashed border-border bg-surface p-6 text-center">
+        <p className="text-sm text-text-muted">
           Reviews will appear here once available.
         </p>
       </div>
@@ -101,8 +101,8 @@ export default function ReviewList({ videoId, refreshKey, optimisticReview, onRe
 
   if (displayedReviews.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-        <p className="text-sm text-gray-500">
+      <div className="rounded-lg border border-dashed border-border bg-surface p-6 text-center">
+        <p className="text-sm text-text-muted">
           No reviews yet. Be the first to review!
         </p>
       </div>
@@ -124,7 +124,7 @@ export default function ReviewList({ videoId, refreshKey, optimisticReview, onRe
         <button
           type="button"
           onClick={() => setPage((p) => p + 1)}
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          className="w-full rounded-lg border border-border bg-surface-2 px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-surface-3 hover:text-text"
         >
           Load more
         </button>
